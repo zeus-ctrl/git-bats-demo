@@ -228,7 +228,7 @@ In the spirit of "the simplest thing that could possibly work", we could very re
 Before we try to make it fail, though, let's also take this opportunity to tell the system what _kind_ of script we're writing here. We can write scripts in lots of different languages; we're using `bash` here, but things like `python` and `ruby` are also quite popular. Given that, it's in our interest explicitly indicate in our script file what language we're going to use for _this_ script. This is such an important and common issue that there's a special syntax for it. If the very first line of an (executable) file has the form
 
 ```bash
-\#!/some/path/to/a/command
+#!/some/path/to/a/command
 ```
 
 Then the system will start up whatever program it finds at `/some/path/to/a/command` and then "feed" it the contents of this file as the program it should execute.
@@ -236,7 +236,7 @@ Then the system will start up whatever program it finds at `/some/path/to/a/comm
 The easily approach is to figure out where `bash` lives on our system with `which bash` and then add a line like:
 
 ```bash
-\#!/usr/bin/bash
+#!/usr/bin/bash
 ```
 
 to the top of our script. This has to be the very first line, the `#` has to be in the very first position in that line, and there can be no spaces between `#!` (oddly enough pronounce "shebang") and the path to the executable you want to specify.
@@ -244,7 +244,7 @@ to the top of our script. This has to be the very first line, the `#` has to be 
 Alternatively, if we didn't want to hardcode the location and instead wanted to use the user's `PATH` environment variable to find the executable we could instead use:
 
 ```bash
-\#!/usr/bin/env bash
+#!/usr/bin/env bash
 ```
 
 You see this style a lot, and it's particularly useful if you want to allow people to use some particular version of something like Ruby that they've possibly got installed in a non-standard location. People are unlikely to have some other install of `bash`, though, so we'll go with the former option here.
@@ -266,7 +266,7 @@ ls: cannot access slkdjflskjfdslkfjslfkj: No such file or directory
 So if we edit our script to be:
 
 ```bash
-\#!/usr/bin/bash
+#!/usr/bin/bash
 
 ls slkdjflskjfdslkfjslfkj
 ```
@@ -300,7 +300,7 @@ It's important to run the `echo $?` _immediately_ after the `ls` command (before
 When you're done exploring the fun of return statuses, change your script to:
 
 ```bash
-\#!/usr/bin/bash
+#!/usr/bin/bash
 
 ls
 ```
