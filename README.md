@@ -305,4 +305,59 @@ When you're done exploring the fun of return statuses, change your script to:
 ls
 ```
 
-and it should pass the first three tests.
+and it should pass the first three tests. The `ls` isn't really doing anything but acting as a placeholder command that is unlikely to fail. We'll replace it with something else in the next step.
+
+## The script prints out one line of text
+
+Odds are `ls` from the previous step generates more than one line of output, so this test probably fails.
+
+Let's get it to pass by replacing the `ls` line with `echo`, essentially turning our script into a `bash` solution to the classic "Hello, world!" problem.
+
+```bash
+#!/usr/bin/bash
+
+echo "Hello, world!"
+```
+
+If you want to see your script generate this friendly greeting run it with:
+
+```bash
+./count_successes.sh
+```
+
+If you re-run our tests (`bats bats_tests.sh`) you should find that the first four tests now pass.
+
+## The script prints out a line with the right form
+
+We're currently printing "Hello, world!", when what we desire is something of the form 
+
+```
+There were XXX successes and YYY failures.
+```
+
+So let's change our `echo` command to print a line having that form:
+
+```bash
+#!/usr/bin/bash
+
+echo "There were 82 successes and 523 failures."
+```
+
+I picked 82 and 523 entirely at random here. Any natural numbers ought to pass the test.
+
+## The script prints out a line with the correct number of successes
+
+Oh, it turns out that 82 apparently isn't the correct number of successes. Now we have several options:
+
+* We could actually do something with the tarball specified on the command line and try to make real progress on the problem.
+* We could look in the test script and find out what the right answer is (78, it turns out) and hack that into our `echo` line.
+
+The second option may seem pretty silly (at best) or like a kind of cheating (at worst), but in test-driven development it's entirely legit. The idea in TDD is that we really shouldn't do anything that isn't driven by a test, and so far nothing in the tests really prevent us from just hacking 78 into our `echo` line.
+
+So let's do it:
+
+```bash
+#!/usr/bin/bash
+
+echo "There were 78 successes and 523 failures."
+```
