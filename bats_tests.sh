@@ -13,7 +13,7 @@
 # This checks that there is a file called "count_successes.sh"
 # in this directory. If this fails, it's because you haven't
 # created the file, or you created it in the wrong place.
-@test "The shell script file `count_successes.sh` exists" {
+@test "The shell script file 'count_successes.sh' exists" {
   [ -f "count_successes.sh" ]
 }
 
@@ -21,18 +21,46 @@
 # in this directory is executable. If the previous test passes
 # but this test fails, it's because you haven't set the
 # permissions on the file with `chmod`.
-@test "The shell script file `count_successes.sh` is executable" {
+@test "The shell script file 'count_successes.sh' is executable" {
   [ -x "count_successes.sh" ]
 }
 
-# Not sure how to handle the temporary directory issue. Maybe pass it in
-# as an optional second argument? But then what's to make sure they don't
-# depend on it.
+# This checks that running the script doesn't generate an error code.
+@test "The script runs without generating an error code" {
+  run ./count_successes.sh files.tgz
+  [ "$status" -eq 0 ]
+}
 
-# This seems fairly intractable to me, which sucks.
+# This checks that the script prints out a single line, without
+# worrying about what is on that line.
+@test "The script prints out one line of text" {
+  run ./count_successes.sh files.tgz
+  [ "${#lines[@]}" -eq 1 ]
+}
 
-# Maybe I require that they use a pattern which has their user name in
-# it so I know where to look. But again, I want them to delete that as part of
-# cleaning up after themselves, so I'm not sure how I'd ever test for that.
+ANSWER_REGEX="^There were [[:digit:]]+ successes and [[:digit:]]+ failures.$"
 
-# Ugh.
+# This checks that the script prints out a line with the right form,
+# but without worrying whether the numbers are correct.
+@test "The script prints out a line with the right form" {
+  run ./count_successes.sh files.tgz
+  [[ $output =~ $ANSWER_REGEX ]]
+}
+
+SUCCESS_REGEX="^There were 78 successes and [[:digit:]]+ failures.$"
+
+# This checks that the script outputs the correct number of successes,
+# but doesn't worry about the number of failures.
+@test "The script prints out a line with the correct number of successes" {
+  run ./count_successes.sh files.tgz
+  [[ $output =~ $SUCCESS_REGEX ]]
+}
+
+FAILURE_REGEX="^There were [[:digit:]]+ successes and 22 failures.$"
+
+# This checks that the script outputs the correct number of failures,
+# but doesn't worry about the number of successes.
+@test "The script prints out a line with the correct number of failures" {
+  run ./count_successes.sh files.tgz
+  [[ $output =~ $FAILURE_REGEX ]]
+}
