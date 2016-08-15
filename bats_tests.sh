@@ -27,14 +27,14 @@
 
 # This checks that running the script doesn't generate an error code.
 @test "The script runs without generating an error code" {
-  run ./count_successes.sh files.tgz
+  run ./count_successes.sh test_data/files.tgz
   [ "$status" -eq 0 ]
 }
 
 # This checks that the script prints out a single line, without
 # worrying about what is on that line.
 @test "The script prints out one line of text" {
-  run ./count_successes.sh files.tgz
+  run ./count_successes.sh test_data/files.tgz
   [ "${#lines[@]}" -eq 1 ]
 }
 
@@ -43,7 +43,7 @@ ANSWER_REGEX="^There were [[:digit:]]+ successes and [[:digit:]]+ failures.$"
 # This checks that the script prints out a line with the right form,
 # but without worrying whether the numbers are correct.
 @test "The script prints out a line with the right form" {
-  run ./count_successes.sh files.tgz
+  run ./count_successes.sh test_data/files.tgz
   [[ $output =~ $ANSWER_REGEX ]]
 }
 
@@ -52,7 +52,7 @@ SUCCESS_REGEX="^There were 78 successes and [[:digit:]]+ failures.$"
 # This checks that the script outputs the correct number of successes,
 # but doesn't worry about the number of failures.
 @test "The script prints out a line with the correct number of successes" {
-  run ./count_successes.sh files.tgz
+  run ./count_successes.sh test_data/files.tgz
   [[ $output =~ $SUCCESS_REGEX ]]
 }
 
@@ -61,6 +61,6 @@ FAILURE_REGEX="^There were [[:digit:]]+ successes and 22 failures.$"
 # This checks that the script outputs the correct number of failures,
 # but doesn't worry about the number of successes.
 @test "The script prints out a line with the correct number of failures" {
-  run ./count_successes.sh files.tgz
+  run ./count_successes.sh test_data/files.tgz
   [[ $output =~ $FAILURE_REGEX ]]
 }
