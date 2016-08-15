@@ -22,7 +22,7 @@ installed on it:
 * `bash`
 * `bats`
 
-`git` and `bash` are standard on almost any *nix environment these days,
+`git` and `bash` are standard on almost any Unix-like environment these days,
 including MacOS, but if you're on a Windows box you may need to do some work
 to get those installed.
 
@@ -194,3 +194,115 @@ If we can pass all of these tests, then we've probably got it right, or very nea
 ---
 
 # A solution
+
+There are obviously numerous ways to solve this problem; here we'll walk through one very step-by-step solution that works by running the tests, and then trying to come up with the _simplest possible thing_ that can make that test pass. Because we'll deliberately do very simple (and often clearly "wrong") things, we'll get several tests to pass in "silly" ways that later tests will force us to revisit.
+
+## The shell script file `count_successes.sh` exists
+
+The easiest way to fix this is to create an empty file with that name. The Unix command `touch` will do exactly that, so
+
+```bash
+touch count_successes.sh
+```
+
+should get us past that test.
+
+## The shell script file 'count_successes.sh' is executable
+
+The file we just created isn't typically executable by default, and we need to tell the system that we intend for it to be an executable file/script. The Unix `chmod` (change mode, which is Unix-speak for change permissions) will do that:
+
+```bash
+chmod +x count_successes.sh
+```
+
+The `+x` command line argument says that we want to add (`+`) execute (`x`) permissions to the specified file. The other types of permissions are `r` (read) and `w` (write), and we can specify these at the level of all (`a`, everyone, the default so we didn't have to explicitly list it in our command), user (`u`, i.e., you), group (`g`, people in your Unix group, which could be no one else or _everyone_ else, so use group with care), and other (`o`, anyone other than you and people in your group).
+
+## The script runs without generating an error code
+
+It turns out that this one passes straight away without our having to do anything!
+
+In the spirit of "the simplest thing that could possibly work", we could very reasonably just choose to move on to the next failing test. I always like knowing how to make tests fail, though, just to make sure my test framework is doing something sensible. So let's make our script something that runs, but fails.
+
+### Saying what language we're using
+
+Before we try to make it fail, though, let's also take this opportunity to tell the system what _kind_ of script we're writing here. We can write scripts in lots of different languages; we're using `bash` here, but things like `python` and `ruby` are also quite popular. Given that, it's in our interest explicitly indicate in our script file what language we're going to use for _this_ script. This is such an important and common issue that there's a special syntax for it. If the very first line of an (executable) file has the form
+
+```bash
+\#!/some/path/to/a/command
+```
+
+Then the system will start up whatever program it finds at `/some/path/to/a/command` and then "feed" it the contents of this file as the program it should execute.
+
+The easily approach is to figure out where `bash` lives on our system with `which bash` and then add a line like:
+
+```bash
+\#!/usr/bin/bash
+```
+
+to the top of our script. This has to be the very first line, the `#` has to be in the very first position in that line, and there can be no spaces between `#!` (oddly enough pronounce "shebang") and the path to the executable you want to specify.
+
+Alternatively, if we didn't want to hardcode the location and instead wanted to use the user's `PATH` environment variable to find the executable we could instead use:
+
+```bash
+\#!/usr/bin/env bash
+```
+
+You see this style a lot, and it's particularly useful if you want to allow people to use some particular version of something like Ruby that they've possibly got installed in a non-standard location. People are unlikely to have some other install of `bash`, though, so we'll go with the former option here.
+
+### Making the test fail (and error status codes)
+
+A simple command that should fail is something like:
+
+```bash
+ls slkdjflskjfdslkfjslfkj
+```
+
+If you execute this on the command line it should (unless you happen to have a file called `slkdjflskjfdslkfjslfkj` in this directory) fail with the message
+
+```
+ls: cannot access slkdjflskjfdslkfjslfkj: No such file or directory
+```
+
+So if we edit our script to be:
+
+```bash
+\#!/usr/bin/bash
+
+ls slkdjflskjfdslkfjslfkj
+```
+
+and run it with
+
+```bash
+./count_successes.sh
+```
+
+we should get that error message. And if we run the tests (`bats bat_tests.sh`) we should find the "The script runs without generating an error code" test failing as well.
+
+Each command line we execute generates a result state that the shell captures and makes available to us if we want. Successful commands return a status of 0, and failed commands return non-zero status codes in some fashion deemed appropriate by the authors of the command. If we do `man ls`, for example, and page down to very near the end of the documentation, we find:
+
+```
+Exit status:
+       0      if OK,
+       1      if minor problems (e.g., cannot access subdirectory),
+       2      if serious trouble (e.g., cannot access command-line argument).
+```
+
+If we want to see which of these two error codes (1 or 2) `ls` returns when we execute
+
+```bash
+ls slkdjflskjfdslkfjslfkj
+echo $?
+```
+
+It's important to run the `echo $?` _immediately_ after the `ls` command (before something else you do replaces the return status). `$?` is a special `bash` variable that holds the return status of the previously executed shell command. `echo` essentially just "prints" the value of a string (or in this case a shell variable), so `echo $?` displays the value of the status returns by our broken `ls` command. (And, for the record, we get a 2, so not being able to find the file apparently counts as "serious trouble".)
+
+When you're done exploring the fun of return statuses, change your script to:
+
+```bash
+\#!/usr/bin/bash
+
+ls
+```
+
+and it should pass the first three tests.
