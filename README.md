@@ -28,7 +28,7 @@ The `bats` unit testing tool for `bash` is _not_ typically standard and will
 likely need to be installed unless you're working in a lab environment where
 `bats` has been pre-installed.
 
-_NOTE:_ The solution in the `solution` branch depends in
+_NOTE:_ The solution described below (and in the `solution` branch) depends in
 at least two places on the GNU behavior of command line
 tools in ways that differ from the BSD behavior of those
 tools. Since MacOS is built on BSD that solution won't
@@ -39,25 +39,26 @@ work as written on a Mac. One work-around if you're on a Mac is to [install GNU 
 # Setting up the repo
 
 You'll need to start by getting your own copy of the repository, both on Github
-and on the computer you're working on.
+and on the computer you're working on. We've included
+links into Github's documentation for these various steps as we go. [Atlassian's `git` tutorials](https://www.atlassian.com/git/tutorials/what-is-version-control) are also very good; they tend to focus on BitBucket instead of Github, but the `git` parts are all the same.
 
 ## Fork the repo
 
-Start by forking this repository by clicking the "Fork" button near the top
+Start by [forking this repository](https://help.github.com/articles/fork-a-repo/#fork-an-example-repository) by clicking the "Fork" button near the top
 right of the Github page for this repo. This creates a copy of the project
 _on Github_ that belongs to you. You'll have full permissions on this copy so
 you can change the code, add collaborators, etc.
 
 ## Add collaborators
 
-If you have teammates for this project, add them as collaborators now. Click
+If you have teammates for this project, [add them as collaborators](https://help.github.com/articles/inviting-collaborators-to-a-personal-repository/) now. Click
 the "Settings" link on the Github repo page for _your fork_. Then choose the
 "Collaborators & Teams" tab, and add your collaborators as needed.
 
 ## Clone the repo on your computer
 
-Now that you have a forked copy on Github, you want to `clone` that so you
-have a copy on the computer you'll be programming on. There are essentially
+Now that you have a forked copy on Github, you want to [`clone` that so you
+have a copy on the computer you'll be programming on](https://help.github.com/articles/fork-a-repo/#keep-your-fork-synced). There are essentially
 two parts to this process: Setting a place for the project on your computer,
 and then cloning your fork to that location.
 
@@ -77,6 +78,7 @@ to "move" to the directory where you want to put your working copy of the
 project.
 
 Once that's all done you can clone the project:
+
 * If necessary, go back to the "home" page for your fork of the repo on Github.
 * Get the clone link by clicking the green "Clone or download" button, and then copying the URL in the little popup window.
 * In your terminal type `git clone <url>`, where `<url>` is the URL that you copied from Github.
