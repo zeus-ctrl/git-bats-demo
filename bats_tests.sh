@@ -64,3 +64,17 @@ FAILURE_REGEX="^There were [[:digit:]]+ successes and 22 failures.$"
   run ./count_successes.sh test_data/files.tgz
   [[ $output =~ $FAILURE_REGEX ]]
 }
+
+# The final check for all the expected output for 'files.tgz'.
+@test "The script prints the correct output for 'files.tgz'" {
+  run ./count_successes.sh test_data/files.tgz
+  [[ $output == "There were 78 successes and 22 failures." ]]
+}
+
+OTHER_TARGET_REGEX="^There were 76 successes and 24 failures.$"
+
+# Checks that the script also works for 'second_file_set.tgz'.
+@test "Script prints the correct output for 'second_file_set.tgz'" {
+  run ./count_successes.sh test_data/second_file_set.tgz
+  [[ $output == "There were 76 successes and 24 failures." ]]
+}
