@@ -8,6 +8,11 @@ The idea here is to fork this repo, and then use the provided `bats` tests and
 test-driven development (TDD) to incrementally build up a solution to a
 (simple) problem.
 
+* [Pre-requisites](#pre-requisites)
+* [Setting up the repo](#setting-up-the-repo)
+* [Stating the problem](#the-problem)
+* [Solving the problem](#a-solution)
+
 # Pre-requisites
 
 This demo assumes that the computer you're working on has at least the following
@@ -22,6 +27,14 @@ to get those installed.
 The `bats` unit testing tool for `bash` is _not_ typically standard and will
 likely need to be installed unless you're working in a lab environment where
 `bats` has been pre-installed.
+
+_NOTE:_ The solution in the `solution` branch depends in
+at least two places on the GNU behavior of command line
+tools in ways that differ from the BSD behavior of those
+tools. Since MacOS is built on BSD that solution won't
+work as written on a Mac. One work-around if you're on a Mac is to [install GNU versions of the command-line tools](https://www.topbug.net/blog/2013/04/14/install-and-use-gnu-command-line-tools-in-mac-os-x/). If you're on a Linux box I would expect all this to work as is.
+
+---
 
 # Setting up the repo
 
@@ -73,6 +86,8 @@ You should probably confirm that you got the directories and files on your
 computer that you see in the project on Github. If all that looks good, you
 should be able to start working on the problem.
 
+---
+
 # The problem
 
 You're to write a `bash` shell script called `count_successes.sh` that takes
@@ -99,7 +114,7 @@ their lab equipment checks the final result and generates these files that
 contain either the world "SUCCESS" or "FAILURE". Your colleague would like you
 to write a script to count those for them.
 
-# Breaking the problem down
+## Breaking the problem down
 
 Given the tarball as a command line argument, your script should:
 * Create a temporary directory where it can do the required work.
@@ -111,7 +126,7 @@ Given the tarball as a command line argument, your script should:
 * Print the results
 * Delete the temporary directory when your done (so we don't clutter up the place)
 
-# The `bats` tests
+## The `bats` tests
 
 To help structure the work, we've taken the set of goals in the previous section
 and implemented them as specific tests in a `bats` test file. Initially all the
@@ -119,3 +134,7 @@ and implemented them as specific tests in a `bats` test file. Initially all the
 help guide you to a solution. If at each point you run the tests and then focus
 on how to make the _next_ failing test pass, they should lead you in a fairly
 direct way to the solution.
+
+---
+
+# A solution
