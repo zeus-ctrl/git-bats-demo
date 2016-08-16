@@ -361,3 +361,18 @@ So let's do it:
 
 echo "There were 78 successes and 523 failures."
 ```
+
+## The script prints out a line with the correct number of failures
+
+In the spirit of our previous "solution", we can again just hack in the right number (22):
+
+```bash
+#!/usr/bin/bash
+
+echo "There were 78 successes and 22 failures."
+```
+
+## The script prints the correct output for 'files.tgz'
+
+Hey, this already passes! Sure, it passes because we hacked in the right values for `files.tgz`, but it passes. So we'll move on to the next (and final) test.
+
