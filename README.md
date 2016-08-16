@@ -28,6 +28,8 @@ to get those installed.
 
 The `bats` unit testing tool for `bash` is _not_ typically installed by default and will likely need to be installed unless you're working in a lab environment where `bats` has been pre-installed.
 
+The descriptions below will go over quite a few "basic" concepts of `bash` and the shell, but this is by no means a introductory primer. It assumes, for example, that you know how to navigate among directories with `cd` and how to use tools like `ls`.
+
 _NOTE:_ The solution described below (and in the `solution` branch) depends in
 at least two places on the GNU behavior of command line
 tools in ways that differ from the BSD behavior of those
@@ -217,11 +219,20 @@ chmod +x count_successes.sh
 
 The `+x` command line argument says that we want to add (`+`) execute (`x`) permissions to the specified file. The other types of permissions are `r` (read) and `w` (write), and we can specify these at the level of all (`a`, everyone, the default so we didn't have to explicitly list it in our command), user (`u`, i.e., you), group (`g`, people in your Unix group, which could be no one else or _everyone_ else, so use group with care), and other (`o`, anyone other than you and people in your group).
 
-## The script runs without generating an error code
+## The script runs without generating an error
 
 It turns out that this one passes straight away without our having to do anything!
 
 In the spirit of "the simplest thing that could possibly work", we could very reasonably just choose to move on to the next failing test. I always like knowing how to make tests fail, though, just to make sure my test framework is doing something sensible. So let's make our script something that runs, but fails.
+
+To see it run (and do nothing) yourself, try
+
+```bash
+./count_successes.sh test_data/files.tgz
+```
+
+You need the `./` in `./count_successes.sh` because in most Unix-like systems the current directory (shorthand `.`) is _not_ in the `PATH` for security reasons. So if you just typed `count_successes.sh test_data/files.tgz`
+you'd get an error of the form `bash: count_successes.sh: command not found...` because `count_successes.sh` wouldn't be anywhere on your `PATH`. Putting `./` at the front provides an absolute path, saying it needs to run the `count_successes.sh` script in the current directory (`.`) instead of looking for it in the `PATH`.
 
 ### Saying what language we're using
 
