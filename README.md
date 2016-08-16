@@ -376,3 +376,53 @@ echo "There were 78 successes and 22 failures."
 
 Hey, this already passes! Sure, it passes because we hacked in the right values for `files.tgz`, but it passes. So we'll move on to the next (and final) test.
 
+## Script prints the correct output for 'second_file_set.tgz'
+
+And here is where we have the pay the piper and actually write a script the truly solves the problem. We could just hack in the right answers for `second_file_set.tgz`, but that would break the tests for `files.tgz`, so to get them both to pass we really have to get the script to do the work outlined in the problem statement.
+
+Repeating the sketch of a solution from (way) up above:
+
+* Create a temporary directory where it can do the required work.
+* Extract the contents of the tarball into that directory.
+* Use `grep` and `wc -l` to count the number of "SUCCESS" and "FAILURE" files
+* Delete the temporary directory (so we don't clutter up the place)
+* Print the results
+
+### Create (and delete) a temporary scratch directory
+
+This could be kind of a pain, but happily it turns out that so many scripts need scratch space like we do that there's a Unix command for just this purpose. The `mktemp` command creates a temporary file in whatever is the "standard" location for temporary files, and which is guaranteed to no conflict with any existing files there. Adding the `--directory` flag creates a directory instead of a file, which is what we want. Thus
+
+```bash
+mktemp --directory
+```
+
+will create the scratch directory we need. But we also need to capture the name of that scratch directory so we can refer to it later in our script. The obvious solution is to assign the value it returns to a variable in our script, so we might think that something like:
+
+```bash
+SCRATCH=mktemp --directory
+```
+
+might do the trick. It won't, though. That actually assigns the string `"mktemp"` to the variable `SCRATCH` and then complains that `--directory` isn't a command of its own. What we have to do is use the fact that in the shell surrounding a command with backpacks (e.g., `\`mktemp --directory\``) will cause the command to be executed and what it returns to be placed (as a string) where the backticked expression was. So what we really want is:
+
+```bash
+SCRATCH=`mktemp --directory`
+```
+
+This will capture the directory name returned by `mktemp` and assign it to our shell variable `SCRATCH`.
+
+We also want to make sure that we delete our scratch directory at the end of script, which we can do with `rm -rf $SCRATCH`. The `-r` flag says to _recurse_ through the directory structure starting at `$SCRATCH` so we get any files, directories, sub-directories, etc., that were in `$SCRATCH`. The `-f` flag _forces_ `rm` to delete everything without asking us for any feedback; by default `-r` is interactive and will ask us about every file it finds, one at a time. `rm -rf` is quite dangerous and should be used with considerable caution; you could use it to delete all the contents of your home directory in one small command, for example, which would obviously be a Very Bad Thing. Here, however, it's a reasonable choice. We created `$SCRATCH` at the beginning of the script, and there shouldn't be anything there that we want to persist after this script finishes.
+
+So let's change our script to this:
+
+```bash
+#!/usr/bin/bash
+
+SCRATCH=mktemp -d
+
+...
+
+rm -rf $SCRATCH
+```
+
+where we'll need to replace the `...` part with the code that does the extracting, counting, and printing.
+
