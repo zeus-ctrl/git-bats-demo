@@ -223,8 +223,6 @@ The `+x` command line argument says that we want to add (`+`) execute (`x`) perm
 
 It turns out that this one passes straight away without our having to do anything!
 
-In the spirit of "the simplest thing that could possibly work", we could very reasonably just choose to move on to the next failing test. I always like knowing how to make tests fail, though, just to make sure my test framework is doing something sensible. So let's make our script something that runs, but fails.
-
 To see it run (and do nothing) yourself, try
 
 ```bash
@@ -233,6 +231,8 @@ To see it run (and do nothing) yourself, try
 
 You need the `./` in `./count_successes.sh` because in most Unix-like systems the current directory (shorthand `.`) is _not_ in the `PATH` for security reasons. So if you just typed `count_successes.sh test_data/files.tgz`
 you'd get an error of the form `bash: count_successes.sh: command not found...` because `count_successes.sh` wouldn't be anywhere on your `PATH`. Putting `./` at the front provides an absolute path, saying it needs to run the `count_successes.sh` script in the current directory (`.`) instead of looking for it in the `PATH`.
+
+In the spirit of "the simplest thing that could possibly work", we could very reasonably just choose to move on to the next failing test. I always like knowing how to make tests fail, though, just to make sure my test framework is doing something sensible. So let's make our script something that runs, but fails.
 
 ### Saying what language we're using
 
