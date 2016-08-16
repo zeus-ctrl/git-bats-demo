@@ -402,7 +402,7 @@ will create the scratch directory we need. But we also need to capture the name 
 SCRATCH=mktemp --directory
 ```
 
-might do the trick. It won't, though. That actually assigns the string `"mktemp"` to the variable `SCRATCH` and then complains that `--directory` isn't a command of its own. What we have to do is use the fact that in the shell surrounding a command with backpacks (e.g., `\`mktemp --directory\``) will cause the command to be executed and what it returns to be placed (as a string) where the backticked expression was. So what we really want is:
+might do the trick. It won't, though. That actually assigns the string `"mktemp"` to the variable `SCRATCH` and then complains that `--directory` isn't a command of its own. What we have to do is use the fact that in the shell surrounding a command with backpacks will cause the command to be executed and what it returns to be placed (as a string) where the backticked expression was. So what we really want is:
 
 ```bash
 SCRATCH=`mktemp --directory`
@@ -417,7 +417,7 @@ So let's change our script to this:
 ```bash
 #!/usr/bin/bash
 
-SCRATCH=mktemp -d
+SCRATCH=`mktemp -d`
 
 ...
 
@@ -426,3 +426,72 @@ rm -rf $SCRATCH
 
 where we'll need to replace the `...` part with the code that does the extracting, counting, and printing.
 
+### Extract the contents of the compressed tarball
+
+The name of the compressed `tar` file we're supposed to extract files from is provided on the command line. Inside the script we can get at the command line arguments using the syntax `$1`, `$2`, `$3`, etc., for the first, second, third, etc., command line arguments. We could just refer to `$1` throughout our script, but it's often helpful to give command line arguments more "meaningful" names by assigning them to variables like `tar_file=$1`.
+
+Now that we know where our `tar` file is, we need to extract the contents. This comes up often enough it's worth just memorizing this pattern: `tar -zxf <filename>`. The `-z` flag says to uncompress the `tar` file on the fly as part of extracting the files; `z` is a mnemonic for `gzip`, which is the compression algorithm being used. The `-x` flag says to _extract_ all the files from the archive; you can also add a `-v` (_verbose_) if you want to see the names of the files as they're being extracted. The `-f` flag says that the next command line argument will be the name of the _file_ that contains the archive.
+
+So `tar -zxf $tar_file` would extract all the files. But it would leave them scattered all over whatever directory we were in when we executed the `tar` command. We want to extract them all into the nice scratch directory we made so we don't clash with other things. Happily `tar` has a command line argument that lets you specify where you want to extract things to: either `-C` or `--directory`. Thus the command:
+
+```bash
+tar -zxf $tar_file --directory=$SCRATCH
+```
+
+will extract all the files from the given compressed `tar` file, putting them all in our temporary scratch directory.
+
+### Counting successes and failures
+
+Now we have all the files extracted into our scratch directory, so we need to count how many contain the word "SUCCESS" and how many contain the word "FAILURE". `grep` is a really useful tool for identifying lines in a file that match a pattern, or in this case files that have a line matching a pattern. In particular
+
+```bash
+grep -l <pattern> <file1> <file2> <file3> …
+```
+
+will return just the names of files that have at least one line that matches the given pattern. We don't really want to have to list all the file names, though; happily the `-r` flag tells `grep` to look _recursively_ through directories, sub-directories, etc.. Thus we can use
+
+```bash
+grep -r -l <pattern> $SCRATCH
+```
+
+to generate a list of all the files in `$SCRATCH` that have a line matching the given pattern.
+
+Now the trick is that we need to _count_ how many files match. An easy way to do that is to use `wc -l`. `wc` is _word count_ and will give you the number of characters, words, and lines in a file or group of files. If you pipe the output of something like `grep` into `wc -l`, though, `wc` will return the number of lines that were passed to it. Since `grep` outputs each file name on a separate line, `wc -l` will give us exactly how many files `grep` returned.
+
+We'll need to capture those counts in variables, which will require the use of backticks again:
+
+```bash
+num_successes=`grep -r -l "SUCCESS" $SCRATCH | wc -l`
+num_failures=`grep -r -l "FAILURE" $SCRATCH | wc -l`
+```
+
+### Putting it all together (and printing out the result)
+
+Now we actually have everything in place, and all we need to do is print out the result. `echo` will take care of that quite nicely:
+
+```bash
+echo "There were $num_successes successes and $num_failures failures."
+```
+
+Here we're using a common `bash` trick of inserting variable values (e.g., `$num_successes`) right in a string. ❗It's crucial, though, that you use double quotes (`"`) if you want this sort of string interpolation; if you use single quotes (`'`) then it won't interpolate the value of variables.
+
+Given all that, our finished script becomes:
+
+```bash
+#!/usr/bin/bash                                                                 
+
+SCRATCH=`mktemp -d`
+
+tar_file=$1
+
+tar -zxf $tar_file --directory=$SCRATCH
+
+num_successes=`grep -r -l "SUCCESS" $SCRATCH | wc -l`
+num_failures=`grep -r -l "FAILURE" $SCRATCH | wc -l`
+
+echo "There were $num_successes successes and $num_failures failures."
+
+rm -rf $SCRATCH
+```
+
+And _hey presto!_ – all our tests pass!
