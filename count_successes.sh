@@ -1,19 +1,16 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
-# The 'g' prefixes on several calls are there to force my Mac to use the GNU
-# version of some of these functions where the GNU behavior is different from
-# the BSD behavior that I get on a Mac.
-SCRATCH=`gmktemp -d --tmpdir`
+SCRATCH=`mktemp --directory`
 
 tgz_file=$1
 
 # Extract everything from the tar file into the scratch directory.
-tar -zxf $tgz_file -C $SCRATCH
+tar -zxf $tgz_file --directory $SCRATCH
 
 # Count the number of successes.
-num_successes=`grep -r SUCCESS $SCRATCH | gwc -l`
+num_successes=`grep -r SUCCESS $SCRATCH | wc -l`
 # Count the number of failures.
-num_failures=`grep -r FAILURE $SCRATCH | gwc -l`
+num_failures=`grep -r FAILURE $SCRATCH | wc -l`
 
 # Clean up the scratch directory
 rm -rf $SCRATCH
