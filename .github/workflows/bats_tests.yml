@@ -1,0 +1,16 @@
+name: Bats tests
+
+on: [push, pull_request]
+
+jobs:
+  bats-test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup BATS testing framework
+      uses: mig4/setup-bats@v1.0.1
+    - name: Check out the code
+      uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Run the bats tests
+      run: bats bats_tests.sh
