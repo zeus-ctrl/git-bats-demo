@@ -1,3 +1,9 @@
+[![Bats tests](../../workflows/Bats%20tests/badge.svg)](../../actions?query=workflow%3A%22Bats+tests%22)
+[![Shellcheck](../../workflows/shellcheck/badge.svg)](../../actions?query=workflow%3Ashellcheck)
+(The `shellcheck` badge should be passing when you "fork" this repo, but
+the `Bats test` badge will be marked as "failing" until you have successfully
+implement the target script.)
+
 # Simple `git` and `bats` demo
 
 This is a very simple repository (repo) that can be used to demonstrate the basics
