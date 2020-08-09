@@ -1,14 +1,14 @@
+# Simple `git` and `bats` demo <!-- omit in toc -->
+
 [![Bats tests](../../workflows/Bats%20tests/badge.svg)](../../actions?query=workflow%3A%22Bats+tests%22)
 [![Shellcheck](../../workflows/shellcheck/badge.svg)](../../actions?query=workflow%3Ashellcheck)
 (The `shellcheck` badge should be passing when you "fork" this repo, but
 the `Bats test` badge will be marked as "failing" until you have successfully
 implement the target script.)
 
-# Simple `git` and `bats` demo
-
-This is a very simple repository (repo) that can be used to demonstrate the basics
-of `git` and Github, as well as the `bats` unit testing tool for `bash` shell
-scripts.
+This is a very simple repository (repo) that can be used to demonstrate
+the basics of `git` and Github, as well as the `bats` unit testing tool
+for `bash` shell scripts.
 
 The idea here is to fork this repo, and then use the provided `bats` tests and
 test-driven development (TDD) to incrementally build up a solution to a
@@ -16,10 +16,34 @@ test-driven development (TDD) to incrementally build up a solution to a
 
 * [Pre-requisites](#pre-requisites)
 * [Setting up the repo](#setting-up-the-repo)
-* [Stating the problem](#the-problem)
-* [Solving the problem](#a-solution)
+  * [Fork the repo](#fork-the-repo)
+  * [Add collaborators](#add-collaborators)
+  * [Clone the repo on your computer](#clone-the-repo-on-your-computer)
+    * [Setting up a project location](#setting-up-a-project-location)
+    * [Cloning to your location](#cloning-to-your-location)
+* [The problem at hand](#the-problem-at-hand)
+  * [Breaking the problem down](#breaking-the-problem-down)
+  * [The `bats` tests](#the-bats-tests)
+* [A solution](#a-solution)
+  * [The shell script file `count_successes.sh` exists](#the-shell-script-file-count_successessh-exists)
+  * [The shell script file 'count_successes.sh' is executable](#the-shell-script-file-count_successessh-is-executable)
+  * [The script runs without generating an error](#the-script-runs-without-generating-an-error)
+    * [Saying what language we're using](#saying-what-language-were-using)
+    * [Making the test fail (and error status codes)](#making-the-test-fail-and-error-status-codes)
+  * [The script prints out one line of text](#the-script-prints-out-one-line-of-text)
+  * [The script prints out a line with the right form](#the-script-prints-out-a-line-with-the-right-form)
+  * [The script prints out a line with the correct number of successes](#the-script-prints-out-a-line-with-the-correct-number-of-successes)
+  * [The script prints out a line with the correct number of failures](#the-script-prints-out-a-line-with-the-correct-number-of-failures)
+  * [The script prints the correct output for 'files.tgz'](#the-script-prints-the-correct-output-for-filestgz)
+  * [Script prints the correct output for 'second_file_set.tgz'](#script-prints-the-correct-output-for-second_file_settgz)
+    * [Create (and delete) a temporary scratch directory](#create-and-delete-a-temporary-scratch-directory)
+    * [Extract the contents of the compressed tarball](#extract-the-contents-of-the-compressed-tarball)
+    * [Counting successes and failures](#counting-successes-and-failures)
+    * [Putting it all together (and printing out the result)](#putting-it-all-together-and-printing-out-the-result)
 
-# Pre-requisites
+---
+
+## Pre-requisites
 
 This demo assumes that the computer you're working on has at least the following
 installed on it:
@@ -44,39 +68,39 @@ work as written on a Mac. One work-around if you're on a Mac is to [install GNU 
 
 ---
 
-# Setting up the repo
+## Setting up the repo
 
 You'll need to start by getting your own copy of the repository, both on Github
 and on the computer you're working on. We've included
 links into Github's documentation for these various steps as we go. [Atlassian's `git` tutorials](https://www.atlassian.com/git/tutorials/what-is-version-control) are also very good; they tend to focus on BitBucket instead of Github, but the `git` parts are all the same.
 
-## Fork the repo
+### Fork the repo
 
 Start by [forking this repository](https://help.github.com/articles/fork-a-repo/#fork-an-example-repository) by clicking the "Fork" button near the top
 right of the Github page for this repo. This creates a copy of the project
 _on Github_ that belongs to you. You'll have full permissions on this copy so
 you can change the code, add collaborators, etc.
 
-## Add collaborators
+### Add collaborators
 
 If you have teammates for this project, [add them as collaborators](https://help.github.com/articles/inviting-collaborators-to-a-personal-repository/) now. Click
 the "Settings" link on the Github repo page for _your fork_. Then choose the
 "Collaborators & Teams" tab, and add your collaborators as needed.
 
-## Clone the repo on your computer
+### Clone the repo on your computer
 
 Now that you have a forked copy on Github, you want to [`clone` that so you
 have a copy on the computer you'll be programming on](https://help.github.com/articles/fork-a-repo/#keep-your-fork-synced). There are essentially
 two parts to this process: Setting a place for the project on your computer,
 and then cloning your fork to that location.
 
-### Setting up a project location
+#### Setting up a project location
 
 You might want to spend a second thinking about where you want this to live
 on your computer. If you're doing this as part of a course, for example, then
 you might want to create a directory for the course.
 
-### Cloning to your location
+#### Cloning to your location
 
 Before you do the cloning, you need to have a terminal window and be in the
 right location. The details of opening a terminal window vary from system to
@@ -98,7 +122,7 @@ should be able to start working on the problem.
 
 ---
 
-# The problem
+## The problem at hand
 
 The goal here is to write a `bash` shell script called `count_successes.sh` that takes
 a single command line
@@ -111,9 +135,9 @@ a call would look something like:
 
 That tarball will contain a collection of files, some of which contain the
 word "SUCCESS" and some of which contain the word "FAILURE". Your script should
-count the successe and failures and print out:
+count the successes and failures and print out:
 
-```
+```english
 There were XXX successes and YYY failures.
 ```
 
@@ -126,19 +150,20 @@ their lab equipment checks the final result and generates these files that
 contain either the world "SUCCESS" or "FAILURE". Your colleague would like you
 to write a script to count those for them.
 
-## Breaking the problem down
+### Breaking the problem down
 
 Given the tarball as a command line argument, your script should:
 
-* Create a temporary directory where it can do the required work.
-** This is important to ensure that you don't end up intermingling the files in the tarball with other files, corrupting the results.
-** It's also nice because then you can delete it when you're done, leaving no clutter behind to annoy others.
+* Create a temporary directory where it can do the required work. **This is
+  important to ensure that you don't end up intermingling the files in the
+  tarball with other files, corrupting the results.** It's also nice because
+  then you can delete it when you're done, leaving no clutter behind to annoy others.
 * Extract the contents of the tarball into that directory.
 * Use `grep` and `wc -l` to count the number of "SUCCESS" and "FAILURE" files
 * Delete the temporary directory (so we don't clutter up the place)
 * Print the results
 
-## The `bats` tests
+### The `bats` tests
 
 To help structure the work, we've taken the set of goals in the previous section
 and implemented them as specific tests in a `bats` test file. Initially all the
@@ -155,7 +180,7 @@ bats bats_tests.sh
 
 `bats` generates two kinds of output, one for a failing test and one for a passing test. If a test fails you'll get a line like:
 
-```
+```bats
  ✗ The shell script file 'count_successes.sh' exists
    (in test file bats_tests.sh, line 17)
      `[ -f "count_successes.sh" ]' failed
@@ -169,13 +194,13 @@ The `✗` indicates that this test failed, and after the `✗` is the (hopefully
 }
 ```
 
-The `@test` says that the following block is a `bats` test with the label 
+The `@test` says that the following block is a `bats` test with the label
 
+```english
+"The shell script file 'count_successes.sh' exists"
 ```
-"The shell script file 'count_successess.sh' exists"
-``` 
 
-The body of the test consists of a single test `[ -f "count_successes.sh" ]`. The square brackets are special shell syntax that are used to indicate a test; tests are often used in things like shell `if` statements, but can be used as stand alone assertions in `bats` tests like here. In this case the test is `-f "count_successes.sh"`, which passes if there is a file (hence the `-f`) in the current directory called `count_successess.sh`.
+The body of the test consists of a single test `[ -f "count_successes.sh" ]`. The square brackets are special shell syntax that are used to indicate a test; tests are often used in things like shell `if` statements, but can be used as stand alone assertions in `bats` tests like here. In this case the test is `-f "count_successes.sh"`, which passes if there is a file (hence the `-f`) in the current directory called `count_successes.sh`.
 
 ❗ _You don't need to understand the tests to solve complete this example exercise._ That said, however, if a test fails and you don't know why, it might prove useful to look at the code for the test and see what it's trying to do so you can try that same thing by hand.
 
@@ -186,7 +211,7 @@ The file `bats_test.sh` here implements the following tests (in this order):
 3. The script `count_successes.sh` runs without generating an error.
    * We arguably don't _need_ these first three tests; passing the later tests presumably implies all these things. Including these "basic" tests, though, makes it easier to use TDD to incrementally build up a solution.
 4. The script prints out a single line of output.
-5. The script generates a line that has the form `There were XXX successes and YYY failures.` where `XXX` and `YYY` are integers. 
+5. The script generates a line that has the form `There were XXX successes and YYY failures.` where `XXX` and `YYY` are integers.
    * This test pays no attention to the particular value of those two numbers, it just requires that there be numbers there. This test essentially catches things like misspellings of "successes" before we start worrying about getting the numbers right.
 6. The script gets the number of successes right.
 7. The script gets the number of failures right.
@@ -197,15 +222,15 @@ The file `bats_test.sh` here implements the following tests (in this order):
 
 If we can pass all of these tests, then we've probably got it right, or very nearly so. We make no promises that these tests are _complete_, however, and there are almost certainly ways to get them to pass that aren't "right" in some important sense.
 
-⚠️ There's no great way to test that you're doing the "right thing" with the temporary scratch directory. If we let you create that directory (and we don't know its name or location) then there's no good way for us to tell that you _actually_ created a scratch directory and deleted it when you're done. So the tests in `bats_tests.sh` 
+⚠️ There's no great way to test that you're doing the "right thing" with the temporary scratch directory. If we let you create that directory (and we don't know its name or location) then there's no good way for us to tell that you _actually_ created a scratch directory and deleted it when you're done. So the tests in `bats_tests.sh`
 
 ---
 
-# A solution
+## A solution
 
 There are obviously numerous ways to solve this problem; here we'll walk through one very step-by-step solution that works by running the tests, and then trying to come up with the _simplest possible thing_ that can make that test pass. Because we'll deliberately do very simple (and often clearly "wrong") things, we'll get several tests to pass in "silly" ways that later tests will force us to revisit.
 
-## The shell script file `count_successes.sh` exists
+### The shell script file `count_successes.sh` exists
 
 The easiest way to fix this is to create an empty file with that name. The Unix command `touch` will do exactly that, so
 
@@ -215,7 +240,7 @@ touch count_successes.sh
 
 should get us past that test.
 
-## The shell script file 'count_successes.sh' is executable
+### The shell script file 'count_successes.sh' is executable
 
 The file we just created isn't typically executable by default, and we need to tell the system that we intend for it to be an executable file/script. The Unix `chmod` (change mode, which is Unix-speak for change permissions) will do that:
 
@@ -225,7 +250,7 @@ chmod +x count_successes.sh
 
 The `+x` command line argument says that we want to add (`+`) execute (`x`) permissions to the specified file. The other types of permissions are `r` (read) and `w` (write), and we can specify these at the level of all (`a`, everyone, the default so we didn't have to explicitly list it in our command), user (`u`, i.e., you), group (`g`, people in your Unix group, which could be no one else or _everyone_ else, so use group with care), and other (`o`, anyone other than you and people in your group).
 
-## The script runs without generating an error
+### The script runs without generating an error
 
 It turns out that this one passes straight away without our having to do anything!
 
@@ -240,7 +265,7 @@ you'd get an error of the form `bash: count_successes.sh: command not found...` 
 
 In the spirit of "the simplest thing that could possibly work", we could very reasonably just choose to move on to the next failing test. I always like knowing how to make tests fail, though, just to make sure my test framework is doing something sensible. So let's make our script something that runs, but fails.
 
-### Saying what language we're using
+#### Saying what language we're using
 
 Before we try to make it fail, though, let's also take this opportunity to tell the system what _kind_ of script we're writing here. We can write scripts in lots of different languages; we're using `bash` here, but things like `python` and `ruby` are also quite popular. Given that, it's in our interest explicitly indicate in our script file what language we're going to use for _this_ script. This is such an important and common issue that there's a special syntax for it. If the very first line of an (executable) file has the form
 
@@ -258,7 +283,7 @@ The easily approach is to figure out where `bash` lives on our system with `whic
 
 to the top of our script. This has to be the very first line, the `#` has to be in the very first position in that line, and there can be no spaces between `#!` (oddly enough pronounce "shebang") and the path to the executable you want to specify.
 
-Alternatively, if we didn't want to hardcode the location and instead wanted to use the user's `PATH` environment variable to find the executable we could instead use:
+Alternatively, if we didn't want to hard-code the location and instead wanted to use the user's `PATH` environment variable to find the executable we could instead use:
 
 ```bash
 #!/usr/bin/env bash
@@ -266,7 +291,7 @@ Alternatively, if we didn't want to hardcode the location and instead wanted to 
 
 You see this style a lot, and it's particularly useful if you want to allow people to use some particular version of something like Ruby that they've possibly got installed in a non-standard location. People are unlikely to have some other install of `bash`, though, so we'll go with the former option here.
 
-### Making the test fail (and error status codes)
+#### Making the test fail (and error status codes)
 
 A simple command that should fail is something like:
 
@@ -276,7 +301,7 @@ ls slkdjflskjfdslkfjslfkj
 
 If you execute this on the command line it should (unless you happen to have a file called `slkdjflskjfdslkfjslfkj` in this directory) fail with the message
 
-```
+```bash
 ls: cannot access slkdjflskjfdslkfjslfkj: No such file or directory
 ```
 
@@ -298,7 +323,7 @@ we should get that error message. And if we run the tests (`bats bat_tests.sh`) 
 
 Each command line we execute generates a result state that the shell captures and makes available to us if we want. Successful commands return a status of 0, and failed commands return non-zero status codes in some fashion deemed appropriate by the authors of the command. If we do `man ls`, for example, and page down to very near the end of the documentation, we find:
 
-```
+```english
 Exit status:
        0      if OK,
        1      if minor problems (e.g., cannot access subdirectory),
@@ -324,7 +349,7 @@ ls
 
 and it should pass the first three tests. The `ls` isn't really doing anything but acting as a placeholder command that is unlikely to fail. We'll replace it with something else in the next step.
 
-## The script prints out one line of text
+### The script prints out one line of text
 
 Odds are `ls` from the previous step generates more than one line of output, so this test probably fails.
 
@@ -344,11 +369,11 @@ If you want to see your script generate this friendly greeting run it with:
 
 If you re-run our tests (`bats bats_tests.sh`) you should find that the first four tests now pass.
 
-## The script prints out a line with the right form
+### The script prints out a line with the right form
 
-We're currently printing "Hello, world!", when what we desire is something of the form 
+We're currently printing "Hello, world!", when what we desire is something of the form
 
-```
+```english
 There were XXX successes and YYY failures.
 ```
 
@@ -362,7 +387,7 @@ echo "There were 82 successes and 523 failures."
 
 I picked 82 and 523 entirely at random here. Any natural numbers ought to pass the test.
 
-## The script prints out a line with the correct number of successes
+### The script prints out a line with the correct number of successes
 
 Oh, it turns out that 82 apparently isn't the correct number of successes. Now we have several options:
 
@@ -379,7 +404,7 @@ So let's do it:
 echo "There were 78 successes and 523 failures."
 ```
 
-## The script prints out a line with the correct number of failures
+### The script prints out a line with the correct number of failures
 
 In the spirit of our previous "solution", we can again just hack in the right number (22):
 
@@ -389,11 +414,11 @@ In the spirit of our previous "solution", we can again just hack in the right nu
 echo "There were 78 successes and 22 failures."
 ```
 
-## The script prints the correct output for 'files.tgz'
+### The script prints the correct output for 'files.tgz'
 
 Hey, this already passes! Sure, it passes because we hacked in the right values for `files.tgz`, but it passes. So we'll move on to the next (and final) test.
 
-## Script prints the correct output for 'second_file_set.tgz'
+### Script prints the correct output for 'second_file_set.tgz'
 
 And here is where we have the pay the piper and actually write a script the truly solves the problem. We could just hack in the right answers for `second_file_set.tgz`, but that would break the tests for `files.tgz`, so to get them both to pass we really have to get the script to do the work outlined in the problem statement.
 
@@ -405,7 +430,7 @@ Repeating the sketch of a solution from (way) up above:
 * Delete the temporary directory (so we don't clutter up the place)
 * Print the results
 
-### Create (and delete) a temporary scratch directory
+#### Create (and delete) a temporary scratch directory
 
 This could be kind of a pain, but happily it turns out that so many scripts need scratch space like we do that there's a Unix command for just this purpose. The `mktemp` command creates a temporary file in whatever is the "standard" location for temporary files, and which is guaranteed to no conflict with any existing files there. Adding the `--directory` flag creates a directory instead of a file, which is what we want. Thus
 
@@ -419,7 +444,7 @@ will create the scratch directory we need. But we also need to capture the name 
 SCRATCH=mktemp --directory
 ```
 
-might do the trick. It won't, though. That actually assigns the string `"mktemp"` to the variable `SCRATCH` and then complains that `--directory` isn't a command of its own. What we have to do is use the fact that in the shell surrounding a command with backpacks will cause the command to be executed and what it returns to be placed (as a string) where the backticked expression was. So what we really want is:
+might do the trick. It won't, though. That actually assigns the string `"mktemp"` to the variable `SCRATCH` and then complains that `--directory` isn't a command of its own. What we have to do is use the fact that in the shell surrounding a command with backpacks will cause the command to be executed and what it returns to be placed (as a string) where the back-ticked expression was. So what we really want is:
 
 ```bash
 SCRATCH=`mktemp --directory`
@@ -443,7 +468,7 @@ rm -rf $SCRATCH
 
 where we'll need to replace the `...` part with the code that does the extracting, counting, and printing.
 
-### Extract the contents of the compressed tarball
+#### Extract the contents of the compressed tarball
 
 The name of the compressed `tar` file we're supposed to extract files from is provided on the command line. Inside the script we can get at the command line arguments using the syntax `$1`, `$2`, `$3`, etc., for the first, second, third, etc., command line arguments. We could just refer to `$1` throughout our script, but it's often helpful to give command line arguments more "meaningful" names by assigning them to variables like `tar_file=$1`.
 
@@ -457,7 +482,7 @@ tar -zxf $tar_file --directory=$SCRATCH
 
 will extract all the files from the given compressed `tar` file, putting them all in our temporary scratch directory.
 
-### Counting successes and failures
+#### Counting successes and failures
 
 Now we have all the files extracted into our scratch directory, so we need to count how many contain the word "SUCCESS" and how many contain the word "FAILURE". `grep` is a really useful tool for identifying lines in a file that match a pattern, or in this case files that have a line matching a pattern. In particular
 
@@ -475,14 +500,14 @@ to generate a list of all the files in `$SCRATCH` that have a line matching the 
 
 Now the trick is that we need to _count_ how many files match. An easy way to do that is to use `wc -l`. `wc` is _word count_ and will give you the number of characters, words, and lines in a file or group of files. If you pipe the output of something like `grep` into `wc -l`, though, `wc` will return the number of lines that were passed to it. Since `grep` outputs each file name on a separate line, `wc -l` will give us exactly how many files `grep` returned.
 
-We'll need to capture those counts in variables, which will require the use of backticks again:
+We'll need to capture those counts in variables, which will require the use of back-ticks again:
 
 ```bash
 num_successes=`grep -r -l "SUCCESS" $SCRATCH | wc -l`
 num_failures=`grep -r -l "FAILURE" $SCRATCH | wc -l`
 ```
 
-### Putting it all together (and printing out the result)
+#### Putting it all together (and printing out the result)
 
 Now we actually have everything in place, and all we need to do is print out the result. `echo` will take care of that quite nicely:
 
@@ -495,7 +520,7 @@ Here we're using a common `bash` trick of inserting variable values (e.g., `$num
 Given all that, our finished script becomes:
 
 ```bash
-#!/usr/bin/bash                                                                 
+#!/usr/bin/bash
 
 SCRATCH=`mktemp -d`
 
