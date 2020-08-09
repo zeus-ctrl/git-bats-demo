@@ -1,5 +1,9 @@
 #!/usr/bin/env bats
 
+load 'testing/bats-support/load'
+load 'testing/bats-assert/load'
+load 'testing/bats-file/load'
+
 # A set of incremental tests that will hopefully guide you
 # through the development of a simple shell script. If you
 # run these tests (`bats bats_tests.sh`) and work on the
