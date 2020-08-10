@@ -14,6 +14,16 @@ The idea here is to fork this repo, and then use the provided `bats` tests and
 test-driven development (TDD) to incrementally build up a solution to a
 (simple) problem.
 
+If you're inclined there's
+[a series of videos where I go through all this](https://www.youtube.com/watch?v=bnzTUy3xh9k&list=PLSAR9qWL-3y7Z--_jF7KUMUwjCwPjjJCY),
+including things like `git` commits, branching, and pull requests. It's rather
+lengthy, though; the whole series is over 2 hours, so I'd watch it at 1.5x
+speed. :smile:
+
+We don't explain the details of all the various tools and commands e use here.
+You should definitely look these up online if you have questions or want to
+learn more.
+
 * [Pre-requisites](#pre-requisites)
 * [Setting up the repo](#setting-up-the-repo)
   * [Fork the repo](#fork-the-repo)
@@ -24,9 +34,10 @@ test-driven development (TDD) to incrementally build up a solution to a
 * [The problem at hand](#the-problem-at-hand)
   * [Breaking the problem down](#breaking-the-problem-down)
   * [The `bats` tests](#the-bats-tests)
+* [Branches and pull requests](#branches-and-pull-requests)
 * [A solution](#a-solution)
   * [The shell script file `count_successes.sh` exists](#the-shell-script-file-count_successessh-exists)
-  * [The shell script file 'count_successes.sh' is executable](#the-shell-script-file-count_successessh-is-executable)
+  * [The shell script file `count_successes.sh` is executable](#the-shell-script-file-count_successessh-is-executable)
   * [The script runs without generating an error](#the-script-runs-without-generating-an-error)
     * [Saying what language we're using](#saying-what-language-were-using)
     * [Making the test fail (and error status codes)](#making-the-test-fail-and-error-status-codes)
@@ -52,11 +63,20 @@ installed on it:
 * `bash`
 * `bats`
 
-`git` and `bash` are standard on almost any Unix-like environment these days,
-including MacOS, but if you're on a Windows box you may need to do some work
-to get those installed.
+`git` and `bash` are standard on almost any Unix-like environment these days.
+This includes MacOS, but you probably want to consider installing
+[the `brew` package management tool](https://brew.sh/) to help install and
+manage things (like `bats`) that Macs don't come with by default.
+If you're on a Windows box installing [the Windows Subsystem
+for Linux](https://docs.microsoft.com/en-us/windows/wsl/) should get you there.
 
-The `bats` unit testing tool for `bash` is _not_ typically installed by default and will likely need to be installed unless you're working in a lab environment where `bats` has been pre-installed.
+[The `bats` unit testing tool](https://github.com/bats-core/bats-core) for
+`bash` is _not_ typically installed by default and will likely need to be
+installed unless you're working in a lab environment where `bats` has
+been pre-installed. :warning: There's an old version of bats and a newer
+(better) version that is often called `bats-core`. If you're trying to
+install bats with a package manager, you probably want to
+try `bats-core` first.
 
 The descriptions below will go over quite a few "basic" concepts of `bash` and the shell, but this is by no means a introductory primer. It assumes, for example, that you know how to navigate among directories with `cd` and how to use tools like `ls`.
 
@@ -72,20 +92,29 @@ work as written on a Mac. One work-around if you're on a Mac is to [install GNU 
 
 You'll need to start by getting your own copy of the repository, both on Github
 and on the computer you're working on. We've included
-links into Github's documentation for these various steps as we go. [Atlassian's `git` tutorials](https://www.atlassian.com/git/tutorials/what-is-version-control) are also very good; they tend to focus on BitBucket instead of Github, but the `git` parts are all the same.
+links into GitHub's documentation for these various steps as we go.
+[Atlassian's `git` tutorials](https://www.atlassian.com/git/tutorials/what-is-version-control)
+are also very good; they tend to focus on BitBucket instead of Github,
+but the `git` parts are all the same. If you want to learn more about `git`
+and `GitHub`, [the "Background" section of this Software Design lab](https://github.com/UMM-CSci-3601/intro-to-git#background)
+has links to lots of resources.
 
 ### Fork the repo
 
-Start by [forking this repository](https://help.github.com/articles/fork-a-repo/#fork-an-example-repository) by clicking the "Fork" button near the top
+Start by [creating a repository from our template](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template)
+by clicking the "Use this template" button near the top
 right of the Github page for this repo. This creates a copy of the project
 _on Github_ that belongs to you. You'll have full permissions on this copy so
 you can change the code, add collaborators, etc.
 
 ### Add collaborators
 
-If you have teammates for this project, [add them as collaborators](https://help.github.com/articles/inviting-collaborators-to-a-personal-repository/) now. Click
-the "Settings" link on the Github repo page for _your fork_. Then choose the
-"Collaborators & Teams" tab, and add your collaborators as needed.
+If you want to work on this with as a group and want other folks to have the
+ability to push commits to the repo on GitHub, then you want to
+[add those other folks as collaborators](https://help.github.com/articles/inviting-collaborators-to-a-personal-repository/)
+now. Click the "Settings" link on the Github repo page for _your fork_.
+Then choose the "Collaborators & Teams" tab, and add your collaborators
+as needed.
 
 ### Clone the repo on your computer
 
@@ -112,8 +141,18 @@ project.
 Once that's all done you can clone the project:
 
 * If necessary, go back to the "home" page for your fork of the repo on Github.
-* Get the clone link by clicking the green "Clone or download" button, and then copying the URL in the little popup window.
-* In your terminal type `git clone <url>`, where `<url>` is the URL that you copied from Github.
+* Get the clone link by clicking the "Code" button/dropdown menu (next to the
+  green "Use this template" button), and then copying the URL in the little
+  popup window.
+* In your terminal type `git clone --submodules <url>`, where `<url>` is the
+  URL that you copied from Github.
+
+:information_source: You usually don't need the `--submodules` flag to
+`git clone`. Bats, however, uses submodules to load additional libraries,
+like `bats-file` which provides assertions about files. Our use of Bats
+here include dependence on three Bats libraries as `git` sub-modules, and
+including the `--submodules` flag ensures that those Bats dependencies will
+be properly included and your tests should run.
 
 This should clone a working copy of your fork of the repo onto your computer.
 You should probably confirm that you got the directories and files on your
@@ -144,8 +183,8 @@ There were XXX successes and YYY failures.
 where `XXX` and `YYY` should be the actual number of files containing "SUCCESS"
 or "FAILURE".
 
-If it helps, imagine you've been approached by a researcher in another field,
-and they've been doing numerous replications of some experiment. A piece of
+If it helps, imagine you've been approached by a researcher that has
+been doing numerous replications of some experiment. A piece of
 their lab equipment checks the final result and generates these files that
 contain either the world "SUCCESS" or "FAILURE". Your colleague would like you
 to write a script to count those for them.
@@ -154,7 +193,7 @@ to write a script to count those for them.
 
 Given the tarball as a command line argument, your script should:
 
-* Create a temporary directory where it can do the required work. **This is
+* Create a temporary directory where it can do the required work. :eyes: **This is
   important to ensure that you don't end up intermingling the files in the
   tarball with other files, corrupting the results.** It's also nice because
   then you can delete it when you're done, leaving no clutter behind to annoy others.
@@ -168,7 +207,8 @@ Given the tarball as a command line argument, your script should:
 To help structure the work, we've taken the set of goals in the previous section
 and implemented them as specific tests in a `bats` test file. Initially all the
 `bats` tests will fail because you haven't even started on the task yet, but
-help guide you to a solution. If at each point you run the tests and then focus
+they can be valuable in helping guide you to a solution. If at each point you
+run the tests and then focus
 on how to make the _next_ failing test pass, they should lead you in a fairly
 direct way to the solution.
 
@@ -182,15 +222,20 @@ bats bats_tests.sh
 
 ```bats
  ✗ The shell script file 'count_successes.sh' exists
-   (in test file bats_tests.sh, line 17)
-     `[ -f "count_successes.sh" ]' failed
+   (from function `assert_exist' in file testing/bats-file/src/file.bash, line 48,
+    in test file bats_tests.sh, line 21)
+     `assert_exist "count_successes.sh"' failed
+
+   -- file or directory does not exist --
+   path : count_successes.sh
+   --
 ```
 
 The `✗` indicates that this test failed, and after the `✗` is the (hopefully description) label of the test from the test itself. `bats` also tells you which line had the failing test and includes the test itself. In this case the failing test is:
 
 ```bash
 @test "The shell script file 'count_successes.sh' exists" {
-  [ -f "count_successes.sh" ]
+  assert_exist "count_successes.sh"
 }
 ```
 
@@ -200,18 +245,29 @@ The `@test` says that the following block is a `bats` test with the label
 "The shell script file 'count_successes.sh' exists"
 ```
 
-The body of the test consists of a single test `[ -f "count_successes.sh" ]`. The square brackets are special shell syntax that are used to indicate a test; tests are often used in things like shell `if` statements, but can be used as stand alone assertions in `bats` tests like here. In this case the test is `-f "count_successes.sh"`, which passes if there is a file (hence the `-f`) in the current directory called `count_successes.sh`.
+The body of the test consists of a single test `assert_exist "count_successes.sh"`.
+The assertion `assert_exist` is provided by the `bats-file` library, and
+succeeds if there is a file with the name given, and fails if there isn't.
 
-❗ _You don't need to understand the tests to solve complete this example exercise._ That said, however, if a test fails and you don't know why, it might prove useful to look at the code for the test and see what it's trying to do so you can try that same thing by hand.
+:memo: _You don't need to understand the tests to solve complete this example exercise._ That said, however, if a test fails and you don't know why, it might prove useful to look at the code for the test and see what it's trying to do so you can try that same thing by hand.
 
-The file `bats_test.sh` here implements the following tests (in this order):
+The file `bats_test.sh` here implements tests that check each of the following
+(in this order):
 
 1. The file `count_successes.sh` exists.
 2. The file `count_successes.sh` is executable.
 3. The script `count_successes.sh` runs without generating an error.
-   * We arguably don't _need_ these first three tests; passing the later tests presumably implies all these things. Including these "basic" tests, though, makes it easier to use TDD to incrementally build up a solution.
+   * We arguably don't _need_ these first three tests; passing the later
+     tests presumably implies all these things. Including these "basic"
+     tests, though, makes it easier to use test-driven development (TDD)
+     to incrementally build up a solution.
 4. The script prints out a single line of output.
-5. The script generates a line that has the form `There were XXX successes and YYY failures.` where `XXX` and `YYY` are integers.
+   * Surprisingly, this passes before we've done any work. That's because the
+     error message saying `count_successes.sh` doesn't exist is exactly one
+     line of text.
+5. The script generates a line that has the form
+   `"There were XXX successes and YYY failures."`, where `XXX` and `YYY`
+   are integers.
    * This test pays no attention to the particular value of those two numbers, it just requires that there be numbers there. This test essentially catches things like misspellings of "successes" before we start worrying about getting the numbers right.
 6. The script gets the number of successes right.
 7. The script gets the number of failures right.
@@ -220,15 +276,46 @@ The file `bats_test.sh` here implements the following tests (in this order):
 9. The script provides the right answer for the `test_data/second_file_set.tgz`.
    * Without a test on a second data set, one could pass all these tests by simply printing the right answer for `test_data/files.tgz` without actually doing any work. Having tests on two data sets at least forces us to pay some attention to the command line argument.
 
-If we can pass all of these tests, then we've probably got it right, or very nearly so. We make no promises that these tests are _complete_, however, and there are almost certainly ways to get them to pass that aren't "right" in some important sense.
+If we can pass all of these tests, then we've probably got it right, or very
+nearly so. We make no promises that these tests are _complete_, however, and
+there are almost certainly ways to get them to pass that aren't "right" in
+some important sense.
 
-⚠️ There's no great way to test that you're doing the "right thing" with the temporary scratch directory. If we let you create that directory (and we don't know its name or location) then there's no good way for us to tell that you _actually_ created a scratch directory and deleted it when you're done. So the tests in `bats_tests.sh`
+⚠️ There's no great way to test that you're doing the "right thing" with the
+temporary scratch directory. If we let you create that directory (and we
+don't know its name or location) then there's no good way for us to tell
+that you _actually_ created a scratch directory and deleted it when you're
+done. So the tests in `bats_tests.sh` can't really check that we've created,
+used, and deleted a scratch directory "correctly", and we can't really "TDD"
+that aspect of the solution.
+
+---
+
+## Branches and pull requests
+
+This would be a good opportunity to practice good development and collaboration
+habits like the use of
+[`git` branches](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)
+and [GitHub pull requests](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests). You can,
+for example, create a branch called something like `implement-script` and
+connect that with a pull request.
+
+Commit often as you go through the solution below, probably after we get
+each new test to pass. When we're all done, have a look at the pull request,
+and review your solution. Even better, [request that a friend provide a
+"real" review of your solution](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/requesting-a-pull-request-review)
+and give you feedback on it.
 
 ---
 
 ## A solution
 
-There are obviously numerous ways to solve this problem; here we'll walk through one very step-by-step solution that works by running the tests, and then trying to come up with the _simplest possible thing_ that can make that test pass. Because we'll deliberately do very simple (and often clearly "wrong") things, we'll get several tests to pass in "silly" ways that later tests will force us to revisit.
+There are obviously numerous ways to solve this problem; here we'll walk
+through one very step-by-step solution that works by going through the tests
+one at a time, trying to come up with the _simplest possible thing_ that
+can make each test pass. Because we'll deliberately do very simple
+and often clearly "wrong") things, we'll get several tests to pass in
+"silly" ways that later tests will force us to revisit.
 
 ### The shell script file `count_successes.sh` exists
 
@@ -240,15 +327,20 @@ touch count_successes.sh
 
 should get us past that test.
 
-### The shell script file 'count_successes.sh' is executable
+### The shell script file `count_successes.sh` is executable
 
-The file we just created isn't typically executable by default, and we need to tell the system that we intend for it to be an executable file/script. The Unix `chmod` (change mode, which is Unix-speak for change permissions) will do that:
+The file we just created isn't typically executable by default, and we need to tell the system that we intend for it to be an executable file/script. The Unix `chmod` (change mode, which is Unix-speak for "change permissions") will do that:
 
 ```bash
 chmod +x count_successes.sh
 ```
 
-The `+x` command line argument says that we want to add (`+`) execute (`x`) permissions to the specified file. The other types of permissions are `r` (read) and `w` (write), and we can specify these at the level of all (`a`, everyone, the default so we didn't have to explicitly list it in our command), user (`u`, i.e., you), group (`g`, people in your Unix group, which could be no one else or _everyone_ else, so use group with care), and other (`o`, anyone other than you and people in your group).
+The `+x` command line argument says that we want to add (`+`) execute (`x`) permissions to the specified file. The other types of permissions are `r` (read) and `w` (write), and we can specify these at the level of
+
+* `a` for "all", i.e., everyone. This is the the default so we didn't have to explicitly list it in our command
+* `u` for "user", i.e., you
+* `g` for "group", i.e., people in your Unix group. Depending on your system's setup, this could be no one else or _everyone_ else or somewhere in between, so use this option with care.
+* `o` for "other", i.e., anyone other than you and people in your group
 
 ### The script runs without generating an error
 
@@ -260,14 +352,28 @@ To see it run (and do nothing) yourself, try
 ./count_successes.sh test_data/files.tgz
 ```
 
-You need the `./` in `./count_successes.sh` because in most Unix-like systems the current directory (shorthand `.`) is _not_ in the `PATH` for security reasons. So if you just typed `count_successes.sh test_data/files.tgz`
-you'd get an error of the form `bash: count_successes.sh: command not found...` because `count_successes.sh` wouldn't be anywhere on your `PATH`. Putting `./` at the front provides an absolute path, saying it needs to run the `count_successes.sh` script in the current directory (`.`) instead of looking for it in the `PATH`.
+You need the `./` in `./count_successes.sh` because in most Unix-like systems
+the current directory (shorthand `.`) is _not_ in the `PATH` for security
+reasons. So if you just typed `count_successes.sh test_data/files.tgz`
+you'd get an error of the form `bash: count_successes.sh: command not found...`
+because `count_successes.sh` wouldn't be anywhere on your `PATH`. Putting `./`
+at the front provides an _absolute path_, saying it needs to run the
+`count_successes.sh` script in the current directory (`.`) instead of looking
+for it in the `PATH`. :information_source: Unix provides `.` as a shorthand
+for the current directory, no matter where you actually are in the filesystem.
 
 In the spirit of "the simplest thing that could possibly work", we could very reasonably just choose to move on to the next failing test. I always like knowing how to make tests fail, though, just to make sure my test framework is doing something sensible. So let's make our script something that runs, but fails.
 
 #### Saying what language we're using
 
-Before we try to make it fail, though, let's also take this opportunity to tell the system what _kind_ of script we're writing here. We can write scripts in lots of different languages; we're using `bash` here, but things like `python` and `ruby` are also quite popular. Given that, it's in our interest explicitly indicate in our script file what language we're going to use for _this_ script. This is such an important and common issue that there's a special syntax for it. If the very first line of an (executable) file has the form
+Before we try to make it fail, though, let's also take this opportunity to
+tell the system what _kind_ of script we're writing here. We can write
+scripts in lots of different languages; we're using `bash` here, but things
+like `python` and `ruby` are also quite popular. Given that, it's in our
+interest to explicitly indicate in our script file what language we're
+going to use for _this_ script. This is such an important and common
+issue that there's a special syntax for it. If the very first line of
+an (executable) file has the form
 
 ```bash
 #!/some/path/to/a/command
@@ -275,21 +381,32 @@ Before we try to make it fail, though, let's also take this opportunity to tell 
 
 Then the system will start up whatever program it finds at `/some/path/to/a/command` and then "feed" it the contents of this file as the program it should execute.
 
-The easily approach is to figure out where `bash` lives on our system with `which bash` and then add a line like:
+The easy approach is to figure out where `bash` lives on our system with `which bash` and then add a line like:
 
 ```bash
 #!/usr/bin/bash
 ```
 
-to the top of our script. This has to be the very first line, the `#` has to be in the very first position in that line, and there can be no spaces between `#!` (oddly enough pronounce "shebang") and the path to the executable you want to specify.
+to the top of our script. This has to be the very first line, the `#` has
+to be in the very first position in that line, and there can be no spaces
+between `#!` (oddly enough pronounce "shebang") and the path to the
+executable you want to specify.
 
-Alternatively, if we didn't want to hard-code the location and instead wanted to use the user's `PATH` environment variable to find the executable we could instead use:
+:warning: Providing an absolute path like `/usr/bin/bash`, however, can
+be problematic. First, an executable like `bash` might not be in the same
+place on all systems, so your script might work on your system, but then
+fail on another system where `bash` is located somewhere else.
+
+So we instead don't want to hard-code the location, and instead use the user's
+`PATH` environment variable to find the executable instead:
 
 ```bash
 #!/usr/bin/env bash
 ```
 
-You see this style a lot, and it's particularly useful if you want to allow people to use some particular version of something like Ruby that they've possibly got installed in a non-standard location. People are unlikely to have some other install of `bash`, though, so we'll go with the former option here.
+:information_source: All systems have essentially agreed that at least the
+`env` command is in `/usr/bin/env`, and then people can use that to figure
+out where other commands like `bash` are.
 
 #### Making the test fail (and error status codes)
 
