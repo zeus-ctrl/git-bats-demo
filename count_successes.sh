@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-SCRATCH=$(mktemp --directory)
-
+# Capture the command line argument
 tgz_file="$1"
+
+# Make a temporary "scratch" directory
+SCRATCH=$(mktemp --directory)
 
 # Extract everything from the tar file into the scratch directory.
 tar -zxf "$tgz_file" --directory "$SCRATCH"
