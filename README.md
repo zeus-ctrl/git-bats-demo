@@ -18,7 +18,9 @@ If you're inclined there's
 [a series of videos where I go through all this](https://www.youtube.com/watch?v=bnzTUy3xh9k&list=PLSAR9qWL-3y7Z--_jF7KUMUwjCwPjjJCY),
 including things like `git` commits, branching, and pull requests. It's rather
 lengthy, though; the whole series is over 2 hours, so I'd watch it at 1.5x
-speed. :smile:
+speed. :smile: :warning: Unfortunately these videos have gotten rather out of
+date, and I haven't had time to remake them. The process is still valid,
+but they use tools like backticks (``) instead of better choices like `$(…)`.
 
 We don't explain the details of all the various tools and commands e use here.
 You should definitely look these up online if you have questions or want to
