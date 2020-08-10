@@ -136,9 +136,7 @@ you can change the code, add collaborators, etc.
 
 <details>
   <summary>
-  
   :warning: Don't use "Use this template"
-  
   </summary>
   
   Bats (and thus this project) depend heavily on `git` submodules, which
@@ -188,12 +186,19 @@ Once that's all done you can clone the project:
 * In your terminal type `git clone --recurse-submodules <url>`, where `<url>` is the
   URL that you copied from Github.
 
-:information_source: &nbsp; You usually don't need the `--recurse-submodules` flag to
-`git clone`. Bats, however, uses submodules to load additional libraries,
-like `bats-file` which provides assertions about files. Our use of Bats
-here include dependence on three Bats libraries as `git` sub-modules, and
-including the `--recurse-submodules` flag ensures that those Bats
-dependencies will be properly included and your tests should run.
+<details>
+  <summary>
+  :information_source: &nbsp; You usually don't need the `--recurse-submodules` 
+  flag to `git clone`.
+  </summary>
+  
+  Bats, however, uses submodules to load additional libraries,
+  like `bats-file` which provides assertions about files. Our use of Bats
+  here include dependence on three Bats libraries as `git` sub-modules, and
+  including the `--recurse-submodules` flag ensures that those Bats
+  dependencies will be properly included and your tests should run.
+
+</details>
 
 This should clone a working copy of your fork of the repo onto your computer.
 You should probably confirm that you got the directories and files on your
