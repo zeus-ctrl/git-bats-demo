@@ -24,6 +24,7 @@ We don't explain the details of all the various tools and commands e use here.
 You should definitely look these up online if you have questions or want to
 learn more.
 
+* [What we'll cover](#what-well-cover)
 * [Pre-requisites](#pre-requisites)
 * [Setting up the repo](#setting-up-the-repo)
   * [Fork the repo](#fork-the-repo)
@@ -48,11 +49,31 @@ learn more.
   * [The script prints the correct output for 'files.tgz'](#the-script-prints-the-correct-output-for-filestgz)
   * [Script prints the correct output for 'second_file_set.tgz'](#script-prints-the-correct-output-for-second_file_settgz)
     * [Create (and delete) a temporary scratch directory](#create-and-delete-a-temporary-scratch-directory)
+    * [WHOA! `shellcheck` isn't happy](#whoa-shellcheck-isnt-happy)
     * [Extract the contents of the compressed tarball](#extract-the-contents-of-the-compressed-tarball)
     * [Counting successes and failures](#counting-successes-and-failures)
     * [Putting it all together (and printing out the result)](#putting-it-all-together-and-printing-out-the-result)
+* [Wrapping up our pull request](#wrapping-up-our-pull-request)
+* [Conclusion](#conclusion)
 
 ---
+
+## What we'll cover
+
+Over the course of this we'll cover (at least briefly) quite a few things:
+
+* A little on how to use `git` and GitHub
+* How to run (& read) Bats tests
+* A little about some shell commands like `touch` and `chmod`
+* A little about shell status codes
+* How to tell a script what interpreter to use (`#!` or "shebang")
+* How to access command line arguments in a shell script
+* How to create and use temporary directories to reduce clutter
+* How to use `$(…)` to capture the output of shell commands
+* How to extract files from a compressed `tar` archive (a `.tgz` file)
+* How to use `grep` to find files that contain a pattern
+* How to use `wc -l` to count how many files `grep` finds
+* How to use `echo` to "write" to the terminal
 
 ## Pre-requisites
 
@@ -416,7 +437,7 @@ A simple command that should fail is something like:
 ls slkdjflskjfdslkfjslfkj
 ```
 
-If you execute this on the command line it should (unless you happen to have a file called `slkdjflskjfdslkfjslfkj` in this directory) fail with the message
+If you execute this on the command line it should fail (unless you happen to have a file called `slkdjflskjfdslkfjslfkj` in this directory :stuck_out_tongue_winking_eye:) with the message
 
 ```bash
 ls: cannot access slkdjflskjfdslkfjslfkj: No such file or directory
@@ -425,7 +446,7 @@ ls: cannot access slkdjflskjfdslkfjslfkj: No such file or directory
 So if we edit our script to be:
 
 ```bash
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 ls slkdjflskjfdslkfjslfkj
 ```
@@ -436,7 +457,7 @@ and run it with
 ./count_successes.sh
 ```
 
-we should get that error message. And if we run the tests (`bats bat_tests.sh`) we should find the "The script runs without generating an error code" test failing as well.
+we should get that error message. And if we run the tests (`bats bat_tests.sh`) we should find that the test labelled "The script runs without generating an error code" fails as well.
 
 Each command line we execute generates a result state that the shell captures and makes available to us if we want. Successful commands return a status of 0, and failed commands return non-zero status codes in some fashion deemed appropriate by the authors of the command. If we do `man ls`, for example, and page down to very near the end of the documentation, we find:
 
@@ -447,7 +468,7 @@ Exit status:
        2      if serious trouble (e.g., cannot access command-line argument).
 ```
 
-If we want to see which of these two error codes (1 or 2) `ls` returns when we execute
+To see which of these two error codes (1 or 2) `ls` returns in our example, try
 
 ```bash
 ls slkdjflskjfdslkfjslfkj
@@ -459,7 +480,7 @@ It's important to run the `echo $?` _immediately_ after the `ls` command (before
 When you're done exploring the fun of return statuses, change your script to:
 
 ```bash
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 ls
 ```
@@ -473,7 +494,7 @@ Odds are `ls` from the previous step generates more than one line of output, so 
 Let's get it to pass by replacing the `ls` line with `echo`, essentially turning our script into a `bash` solution to the classic "Hello, world!" problem.
 
 ```bash
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 echo "Hello, world!"
 ```
@@ -497,59 +518,70 @@ There were XXX successes and YYY failures.
 So let's change our `echo` command to print a line having that form:
 
 ```bash
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 echo "There were 82 successes and 523 failures."
 ```
 
-I picked 82 and 523 entirely at random here. Any natural numbers ought to pass the test.
+I picked 82 and 523 entirely at random here. Any natural numbers ought to
+pass this test.
 
 ### The script prints out a line with the correct number of successes
 
-Oh, it turns out that 82 apparently isn't the correct number of successes. Now we have several options:
+Oh look, it turns out that 82 apparently isn't the correct number of successes. :astonished: :woman_shrugging: :stuck_out_tongue_winking_eye:
+
+Now we have several options:
 
 * We could actually do something with the tarball specified on the command line and try to make real progress on the problem.
 * We could look in the test script and find out what the right answer is (78, it turns out) and hack that into our `echo` line.
 
-The second option may seem pretty silly (at best) or like a kind of cheating (at worst), but in test-driven development it's entirely legit. The idea in TDD is that we really shouldn't do anything that isn't driven by a test, and so far nothing in the tests really prevent us from just hacking 78 into our `echo` line.
+The second option may seem pretty silly (at best) or like a kind of cheating (at worst), but in an extreme approach to test-driven development it's entirely legit. The idea in TDD (especially when taken to the max) is that we really shouldn't do anything that isn't driven by a test, and so far nothing in the tests really prevent us from just hacking 78 into our `echo` line.
 
 So let's do it:
 
 ```bash
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 echo "There were 78 successes and 523 failures."
 ```
 
 ### The script prints out a line with the correct number of failures
 
+And, unsurprisingly, 523 wasn't the correct number of failures, either. :octopus:
+
 In the spirit of our previous "solution", we can again just hack in the right number (22):
 
 ```bash
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 echo "There were 78 successes and 22 failures."
 ```
 
 ### The script prints the correct output for 'files.tgz'
 
-Hey, this already passes! Sure, it passes because we hacked in the right values for `files.tgz`, but it passes. So we'll move on to the next (and final) test.
+Hey, this already passes! Yeah, but this, and several of our other tests,
+pass because we hacked in the right values for `files.tgz`. Still, they do
+pass, so we'll move on to the next (and final) test.
 
 ### Script prints the correct output for 'second_file_set.tgz'
 
-And here is where we have the pay the piper and actually write a script the truly solves the problem. We could just hack in the right answers for `second_file_set.tgz`, but that would break the tests for `files.tgz`, so to get them both to pass we really have to get the script to do the work outlined in the problem statement.
+And here is where we have the pay the piper and actually write a script the
+truly solves the problem. We could just hack in the right answers
+for `second_file_set.tgz`, but that would break the tests for `files.tgz`,
+so to get them both to pass we really have to get the script to do the
+work outlined in the problem statement.
 
 Repeating the sketch of a solution from (way) up above:
 
 * Create a temporary directory where it can do the required work.
 * Extract the contents of the tarball into that directory.
 * Use `grep` and `wc -l` to count the number of "SUCCESS" and "FAILURE" files
-* Delete the temporary directory (so we don't clutter up the place)
+* Delete the temporary directory (so we don't clutter up the universe)
 * Print the results
 
 #### Create (and delete) a temporary scratch directory
 
-This could be kind of a pain, but happily it turns out that so many scripts need scratch space like we do that there's a Unix command for just this purpose. The `mktemp` command creates a temporary file in whatever is the "standard" location for temporary files, and which is guaranteed to no conflict with any existing files there. Adding the `--directory` flag creates a directory instead of a file, which is what we want. Thus
+This could be kind of a pain, but happily it turns out that so many scripts need scratch space like we do that there's a Unix command for just this purpose. The `mktemp` command creates a temporary file in whatever is the "standard" location for temporary files on that system, and which is guaranteed to no conflict with any existing files there. Adding the `--directory` flag creates a directory instead of a file, which is what we want. Thus
 
 ```bash
 mktemp --directory
@@ -561,10 +593,15 @@ will create the scratch directory we need. But we also need to capture the name 
 SCRATCH=mktemp --directory
 ```
 
-might do the trick. It won't, though. That actually assigns the string `"mktemp"` to the variable `SCRATCH` and then complains that `--directory` isn't a command of its own. What we have to do is use the fact that in the shell surrounding a command with backpacks will cause the command to be executed and what it returns to be placed (as a string) where the back-ticked expression was. So what we really want is:
+might do the trick. It won't, though. That actually assigns the string `"mktemp"` to the variable `SCRATCH` and then complains that `--directory` isn't a command of its own.
+
+The bash `$(…)` construct, though, does exactly what we want. Anything we
+put inside `$(…)` will be evaluated, and its value will be put in that place
+in our expression. So we can use that to capture the value returned by `mktemp`
+and assign it to our shell variable:
 
 ```bash
-SCRATCH=`mktemp --directory`
+SCRATCH=$(mktemp --directory)
 ```
 
 This will capture the directory name returned by `mktemp` and assign it to our shell variable `SCRATCH`.
@@ -574,9 +611,9 @@ We also want to make sure that we delete our scratch directory at the end of scr
 So let's change our script to this:
 
 ```bash
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
-SCRATCH=`mktemp -d`
+SCRATCH=$(mktemp -d)
 
 ...
 
@@ -585,43 +622,120 @@ rm -rf $SCRATCH
 
 where we'll need to replace the `...` part with the code that does the extracting, counting, and printing.
 
+#### WHOA! `shellcheck` isn't happy
+
+If we run `shellcheck` on our script we find there are issues:
+
+```bash
+$ shellcheck count_successes.sh
+
+In count_successes.sh line 7:
+rm -rf $SCRATCH
+       ^------^ SC2086: Double quote to prevent globbing and word splitting.
+
+Did you mean:
+rm -rf "$SCRATCH"
+
+For more information:
+  https://www.shellcheck.net/wiki/SC2086 -- Double quote to prevent globbing ...
+```
+
+GitHub Actions is also configured on this repo to run `shellcheck` when you
+commit, so if you were to commit the stub above you'd find that the `shellcheck`
+badge would change to failing :cry:, and if you dug around you'd find this same
+error in those logs.
+
+What this is telling us is that when we put the value of a variable like `SCRATCH`
+in an expression, we ought to put it in double quotes or some bad things can
+happen. I'll let you [follow the link they provide](https://www.shellcheck.net/wiki/SC2086)
+for more details (and examples), but one simple example is the case that the
+value of the variable is a string with a space in it, like `"my temp directory"`.
+Without the quotes the `rm` command would become:
+
+```bash
+   rm -rf my temp directory
+```
+
+and the shell would read that as an attempt to delete three separate items, one
+called `my`, one called `temp`, and one called `directory`.
+
+Quoting as `shellcheck` suggests fixes that problem as the quotes hold the whole
+string together and it's treated as a single argument to `rm`:
+
+```bash
+   rm -rf "my temp directory"
+```
+
+It's a good idea to regularly run `shellcheck` on your script as you go,
+addressing warnings and issues along the way. `shellcheck` will strongly
+encourage us to quote shell variables at several other points down the road,
+for example.
+
 #### Extract the contents of the compressed tarball
 
-The name of the compressed `tar` file we're supposed to extract files from is provided on the command line. Inside the script we can get at the command line arguments using the syntax `$1`, `$2`, `$3`, etc., for the first, second, third, etc., command line arguments. We could just refer to `$1` throughout our script, but it's often helpful to give command line arguments more "meaningful" names by assigning them to variables like `tar_file=$1`.
+The name of the compressed `tar` file we're supposed to extract files from is provided on the command line. Inside the script we can get at the command line arguments using the syntax `$1`, `$2`, `$3`, etc., for the first, second, third, etc., command line arguments. We could just refer to `$1` throughout our script, but it's often helpful to give command line arguments more "meaningful" names by assigning them to variables like
 
-Now that we know where our `tar` file is, we need to extract the contents. This comes up often enough it's worth just memorizing this pattern: `tar -zxf <filename>`. The `-z` flag says to uncompress the `tar` file on the fly as part of extracting the files; `z` is a mnemonic for `gzip`, which is the compression algorithm being used. The `-x` flag says to _extract_ all the files from the archive; you can also add a `-v` (_verbose_) if you want to see the names of the files as they're being extracted. The `-f` flag says that the next command line argument will be the name of the _file_ that contains the archive.
+```bash
+  tar_file=$1
+```
+
+Now that we know where our `tar` file is, we need to extract its contents. This comes up often enough it's worth just memorizing this pattern:
+
+```bash
+  tar -zxf <filename>
+```
+
+The `-z` flag says to uncompress the `tar` file on the fly as part of extracting the files; `z` is a mnemonic for `gzip`, which is the compression algorithm being used. The `-x` flag says to _extract_ all the files from the archive; you can also add a `-v` (_verbose_) if you want to see the names of the files as they're being extracted. The `-f` flag says that the next command line argument will be the name of the _file_ that contains the archive.
+
+:information_source: You can have all these as separate flags, like `tar -z -x -f`,
+or you can bundle them together as `tar -zxf`. :warning: It's *crucial*, though,
+that `-f` be right before the filename. That means that if you bundle them
+together, it's necessary that `f` be the *last* in the last so it immediately
+precedes the file name.
 
 So `tar -zxf $tar_file` would extract all the files. But it would leave them scattered all over whatever directory we were in when we executed the `tar` command. We want to extract them all into the nice scratch directory we made so we don't clash with other things. Happily `tar` has a command line argument that lets you specify where you want to extract things to: either `-C` or `--directory`. Thus the command:
 
 ```bash
-tar -zxf $tar_file --directory=$SCRATCH
+tar -zxf "$tar_file" --directory="$SCRATCH"
 ```
 
-will extract all the files from the given compressed `tar` file, putting them all in our temporary scratch directory.
+will extract all the files from the given compressed `tar` file, putting
+them all in our temporary scratch directory. :memo: Note the quoting of
+the shell variable values `$tar_file` and `$SCRATCH`, as suggested by
+`shellcheck`.
 
 #### Counting successes and failures
 
-Now we have all the files extracted into our scratch directory, so we need to count how many contain the word "SUCCESS" and how many contain the word "FAILURE". `grep` is a really useful tool for identifying lines in a file that match a pattern, or in this case files that have a line matching a pattern. In particular
+Now we have all the files extracted into our scratch directory, so we need
+to count how many contain the word "SUCCESS" and how many contain the
+word "FAILURE". `grep` is a really useful tool for identifying lines in a
+file that match a pattern, or in this case files that have at least one
+line matching a pattern. In particular
 
 ```bash
 grep -l <pattern> <file1> <file2> <file3> …
 ```
 
-will return just the names of files that have at least one line that matches the given pattern. We don't really want to have to list all the file names, though; happily the `-r` flag tells `grep` to look _recursively_ through directories, sub-directories, etc.. Thus we can use
+will return _just_ the names of files that have at least one line that
+matches the given pattern. We don't really want to have to provide all
+the file names separately as arguments to `grep`, however;
+happily the `-r` flag tells `grep` to look
+_recursively_ through directories, sub-directories, etc.. Thus we can use
 
 ```bash
-grep -r -l <pattern> $SCRATCH
+grep -r -l <pattern> "$SCRATCH"
 ```
 
 to generate a list of all the files in `$SCRATCH` that have a line matching the given pattern.
 
 Now the trick is that we need to _count_ how many files match. An easy way to do that is to use `wc -l`. `wc` is _word count_ and will give you the number of characters, words, and lines in a file or group of files. If you pipe the output of something like `grep` into `wc -l`, though, `wc` will return the number of lines that were passed to it. Since `grep` outputs each file name on a separate line, `wc -l` will give us exactly how many files `grep` returned.
 
-We'll need to capture those counts in variables, which will require the use of back-ticks again:
+We'll need to capture those counts in variables, which will require the
+use of `$(…)` again:
 
 ```bash
-num_successes=`grep -r -l "SUCCESS" $SCRATCH | wc -l`
-num_failures=`grep -r -l "FAILURE" $SCRATCH | wc -l`
+num_successes=$(grep -r -l "SUCCESS" "$SCRATCH" | wc -l)
+num_failures=$(grep -r -l "FAILURE" "$SCRATCH" | wc -l)
 ```
 
 #### Putting it all together (and printing out the result)
@@ -637,20 +751,58 @@ Here we're using a common `bash` trick of inserting variable values (e.g., `$num
 Given all that, our finished script becomes:
 
 ```bash
-#!/usr/bin/bash
-
-SCRATCH=`mktemp -d`
+#!/usr/bin/env bash
 
 tar_file=$1
 
-tar -zxf $tar_file --directory=$SCRATCH
+SCRATCH=$(mktemp -d)
 
-num_successes=`grep -r -l "SUCCESS" $SCRATCH | wc -l`
-num_failures=`grep -r -l "FAILURE" $SCRATCH | wc -l`
+tar -zxf "$tar_file" --directory="$SCRATCH"
+
+num_successes=$(grep -r -l "SUCCESS" "$SCRATCH" | wc -l)
+num_failures=$(grep -r -l "FAILURE" "$SCRATCH" | wc -l)
 
 echo "There were $num_successes successes and $num_failures failures."
 
-rm -rf $SCRATCH
+rm -rf "$SCRATCH"
 ```
 
-And _hey presto!_ – all our tests pass!
+And _hey presto!_ – all our tests pass! :tada:
+
+---
+
+## Wrapping up our pull request
+
+Assuming we've been committing to our branch as we've worked through the
+solution, we should have all our work in that branch and, once pushed, as
+part of the pull request on GitHub.
+
+If we were working with other folks, this would be a good point to [request
+code reviews](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/requesting-a-pull-request-review).
+Since I'm working on this solo, I'll review the work myself, and make sure it
+passes all the GitHub Actions checks:
+
+* The tests pass
+* There are no `shellcheck` warnings
+
+If all those look good, I'll merge in the pull request and call it done!
+
+## Conclusion
+
+And there we have it – a TDD solution to developing a simple shell script
+using the Bats testing tool for `bash`. We've learned quite a few things:
+
+* A little on how to use `git` and GitHub
+* How to run (& read) Bats tests
+* A little about some shell commands like `touch` and `chmod`
+* A little about shell status codes
+* How to tell a script what interpreter to use (`#!` or "shebang")
+* How to access command line arguments in a shell script
+* How to create and use temporary directories to reduce clutter
+* How to use `$(…)` to capture the output of shell commands
+* How to extract files from a compressed `tar` archive (a `.tgz` file)
+* How to use `grep` to find files that contain a pattern
+* How to use `wc -l` to count how many files `grep` finds
+* How to use `echo` to "write" to the terminal
+
+Thanks for playing along!
