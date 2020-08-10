@@ -34,6 +34,7 @@ learn more.
 * [Pre-requisites](#pre-requisites)
 * [Setting up the repo](#setting-up-the-repo)
   * [Fork the repo](#fork-the-repo)
+  * [Enable GitHub Actions](#enable-github-actions)
   * [Add collaborators](#add-collaborators)
   * [Clone the repo on your computer](#clone-the-repo-on-your-computer)
     * [Setting up a project location](#setting-up-a-project-location)
@@ -146,6 +147,28 @@ you can change the code, add collaborators, etc.
 
 </details>
 
+### Enable GitHub Actions
+
+By default when you fork a repository like we just did, GitHub disables the
+associated GitHub Actions. We want to re-enable them, though, so you'll get
+the the continuous integration checks that both the tests pass and that
+`shellcheck` is happy.
+
+If you click the "Actions" tab up near the top, you should see a big warning:
+
+> Workflows aren’t being run on this forked repository
+
+along with some info telling you that you should be careful about actions
+(which are essentially executable) code that you might "inherit" through
+forking. So you can trust that we haven't done anything malicious, or you
+can have a look at our actions in `.github/workflows/` and have confirm that
+we're not misbehaving. If you're comfortable, though, you can hit the big
+green button that says:
+
+> I understand my workflows, go ahead and enable them.
+
+Then when you make your next commit, that will trigger GitHub Actions.
+
 ### Add collaborators
 
 If you want to work on this with as a group and want other folks to have the
@@ -188,7 +211,7 @@ Once that's all done you can clone the project:
 
 <details>
   <summary>
-  :information_source: &nbsp; You usually don't need the `--recurse-submodules` 
+  :information_source: &nbsp; You usually don't need the `--recurse-submodules`
   flag to `git clone`.
   </summary>
   
