@@ -10,7 +10,7 @@ This is a very simple repository (repo) that can be used to demonstrate
 the basics of `git` and Github, as well as the `bats` unit testing tool
 for `bash` shell scripts.
 
-The idea here is to fork this repo, and then use the provided `bats` tests and
+The idea here is to fork (copy) this repo, and then use the provided `bats` tests and
 test-driven development (TDD) to incrementally build up a solution to a
 (simple) problem.
 
@@ -128,11 +128,19 @@ has links to lots of resources.
 
 ### Fork the repo
 
-Start by [creating a repository from our template](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template)
-by clicking the "Use this template" button near the top
+Start by [forking this repo](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo)
+by clicking the "Fork" button near the top
 right of the Github page for this repo. This creates a copy of the project
 _on Github_ that belongs to you. You'll have full permissions on this copy so
 you can change the code, add collaborators, etc.
+
+<details>
+  <summary>:warning: Don't use "Use this template"</summary>
+  Bats (and thus this project) depend heavily on `git` submodules, which
+  don't work properly with GitHub templates. So make sure you use "Fork"
+  instead of "Use this template" to create your copy of the repository
+  on GitHub.
+</details>
 
 ### Add collaborators
 
@@ -171,15 +179,18 @@ Once that's all done you can clone the project:
 * Get the clone link by clicking the "Code" button/dropdown menu (next to the
   green "Use this template" button), and then copying the URL in the little
   popup window.
-* In your terminal type `git clone --submodules <url>`, where `<url>` is the
+* In your terminal type `git clone --recurse-submodules <url>`, where `<url>` is the
   URL that you copied from Github.
 
-:information_source: You usually don't need the `--submodules` flag to
-`git clone`. Bats, however, uses submodules to load additional libraries,
-like `bats-file` which provides assertions about files. Our use of Bats
-here include dependence on three Bats libraries as `git` sub-modules, and
-including the `--submodules` flag ensures that those Bats dependencies will
-be properly included and your tests should run.
+<details>
+  <summary>:information_source: You usually don't need the `--recurse-submodules` flag to
+`git clone`.</summary>
+  Bats, however, uses submodules to load additional libraries,
+  like `bats-file` which provides assertions about files. Our use of Bats
+  here include dependence on three Bats libraries as `git` sub-modules, and
+  including the `--recurse-submodules` flag ensures that those Bats
+  dependencies will be properly included and your tests should run.
+</details>
 
 This should clone a working copy of your fork of the repo onto your computer.
 You should probably confirm that you got the directories and files on your
