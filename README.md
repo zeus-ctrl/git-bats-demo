@@ -136,7 +136,7 @@ you can change the code, add collaborators, etc.
 
 <details>
   <summary>
-  :warning: Don't use "Use this template"
+  :warning: Don't use the "Use this template" button.
   </summary>
   
   Bats (and thus this project) depend heavily on `git` submodules, which
@@ -192,11 +192,12 @@ Once that's all done you can clone the project:
   flag to `git clone`.
   </summary>
   
-  Bats, however, uses submodules to load additional libraries,
+  Bats uses submodules to load additional libraries,
   like `bats-file` which provides assertions about files. Our use of Bats
   here include dependence on three Bats libraries as `git` sub-modules, and
   including the `--recurse-submodules` flag ensures that those Bats
-  dependencies will be properly included and your tests should run.
+  dependencies will be properly included. Without that your tests won't run.
+  See `testing/README.md` for more details.
 
 </details>
 
