@@ -18,7 +18,9 @@ If you're inclined there's
 [a series of videos where I go through all this](https://www.youtube.com/watch?v=bnzTUy3xh9k&list=PLSAR9qWL-3y7Z--_jF7KUMUwjCwPjjJCY),
 including things like `git` commits, branching, and pull requests. It's rather
 lengthy, though; the whole series is over 2 hours, so I'd watch it at 1.5x
-speed. :smile: :warning: Unfortunately these videos have gotten rather out of
+speed. :smile:
+
+:warning: Unfortunately these videos have gotten rather out of
 date, and I haven't had time to remake them. The process is still valid,
 but they use tools like backticks (``) instead of better choices like `$(…)`.
 
@@ -748,7 +750,7 @@ Now we actually have everything in place, and all we need to do is print out the
 echo "There were $num_successes successes and $num_failures failures."
 ```
 
-Here we're using a common `bash` trick of inserting variable values (e.g., `$num_successes`) right in a string. ❗It's crucial, though, that you use double quotes (`"`) if you want this sort of string interpolation; if you use single quotes (`'`) then it won't interpolate the value of variables.
+Here we're using a common `bash` trick of inserting variable values (e.g., `$num_successes`) right in a string. :warning: It's crucial, though, that you use double quotes (`"`) if you want this sort of string interpolation; if you use single quotes (`'`) then it won't interpolate the value of variables.
 
 Given all that, our finished script becomes:
 
