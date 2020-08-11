@@ -135,18 +135,6 @@ right of the Github page for this repo. This creates a copy of the project
 _on Github_ that belongs to you. You'll have full permissions on this copy so
 you can change the code, add collaborators, etc.
 
-<details>
-  <summary>
-  :warning: Don't use the "Use this template" button.
-  </summary>
-  
-  Bats (and thus this project) depend heavily on `git` submodules, which
-  don't work properly with GitHub templates. So make sure you use "Fork"
-  instead of "Use this template" to create your copy of the repository
-  on GitHub.
-
-</details>
-
 ### Enable GitHub Actions
 
 By default when you fork a repository like we just did, GitHub disables the
@@ -203,9 +191,8 @@ project.
 Once that's all done you can clone the project:
 
 * If necessary, go back to the "home" page for your fork of the repo on Github.
-* Get the clone link by clicking the "Code" button/dropdown menu (next to the
-  green "Use this template" button), and then copying the URL in the little
-  popup window.
+* Get the clone link by clicking the big green "Code" button/dropdown menu,
+  and then copying the URL in the little popup window.
 * In your terminal type `git clone --recurse-submodules <url>`, where `<url>` is the
   URL that you copied from Github.
 
