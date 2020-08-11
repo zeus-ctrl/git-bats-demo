@@ -10,7 +10,7 @@ This is a very simple repository (repo) that can be used to demonstrate
 the basics of `git` and Github, as well as the `bats` unit testing tool
 for `bash` shell scripts.
 
-The idea here is to fork this repo, and then use the provided `bats` tests and
+The idea here is to fork (copy) this repo, and then use the provided `bats` tests and
 test-driven development (TDD) to incrementally build up a solution to a
 (simple) problem.
 
@@ -34,6 +34,7 @@ learn more.
 * [Pre-requisites](#pre-requisites)
 * [Setting up the repo](#setting-up-the-repo)
   * [Fork the repo](#fork-the-repo)
+  * [Enable GitHub Actions](#enable-github-actions)
   * [Add collaborators](#add-collaborators)
   * [Clone the repo on your computer](#clone-the-repo-on-your-computer)
     * [Setting up a project location](#setting-up-a-project-location)
@@ -128,11 +129,33 @@ has links to lots of resources.
 
 ### Fork the repo
 
-Start by [creating a repository from our template](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template)
-by clicking the "Use this template" button near the top
+Start by [forking this repo](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo)
+by clicking the "Fork" button near the top
 right of the Github page for this repo. This creates a copy of the project
 _on Github_ that belongs to you. You'll have full permissions on this copy so
 you can change the code, add collaborators, etc.
+
+### Enable GitHub Actions
+
+By default when you fork a repository like we just did, GitHub disables the
+associated GitHub Actions. We want to re-enable them, though, so you'll get
+the the continuous integration checks that both the tests pass and that
+`shellcheck` is happy.
+
+If you click the "Actions" tab up near the top, you should see a big warning:
+
+> Workflows aren’t being run on this forked repository
+
+along with some info telling you that you should be careful about actions
+(which are essentially executable) code that you might "inherit" through
+forking. So you can trust that we haven't done anything malicious, or you
+can have a look at our actions in `.github/workflows/` and have confirm that
+we're not misbehaving. If you're comfortable, though, you can hit the big
+green button that says:
+
+> I understand my workflows, go ahead and enable them.
+
+Then when you make your next commit, that will trigger GitHub Actions.
 
 ### Add collaborators
 
@@ -168,18 +191,25 @@ project.
 Once that's all done you can clone the project:
 
 * If necessary, go back to the "home" page for your fork of the repo on Github.
-* Get the clone link by clicking the "Code" button/dropdown menu (next to the
-  green "Use this template" button), and then copying the URL in the little
-  popup window.
-* In your terminal type `git clone --submodules <url>`, where `<url>` is the
+* Get the clone link by clicking the big green "Code" button/dropdown menu,
+  and then copying the URL in the little popup window.
+* In your terminal type `git clone --recurse-submodules <url>`, where `<url>` is the
   URL that you copied from Github.
 
-:information_source: You usually don't need the `--submodules` flag to
-`git clone`. Bats, however, uses submodules to load additional libraries,
-like `bats-file` which provides assertions about files. Our use of Bats
-here include dependence on three Bats libraries as `git` sub-modules, and
-including the `--submodules` flag ensures that those Bats dependencies will
-be properly included and your tests should run.
+<details>
+  <summary>
+  :information_source: &nbsp; You usually don't need the `--recurse-submodules`
+  flag to `git clone`.
+  </summary>
+  
+  Bats uses submodules to load additional libraries,
+  like `bats-file` which provides assertions about files. Our use of Bats
+  here include dependence on three Bats libraries as `git` sub-modules, and
+  including the `--recurse-submodules` flag ensures that those Bats
+  dependencies will be properly included. Without that your tests won't run.
+  See `testing/README.md` for more details.
+
+</details>
 
 This should clone a working copy of your fork of the repo onto your computer.
 You should probably confirm that you got the directories and files on your
