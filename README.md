@@ -26,7 +26,7 @@ but they use tools like backticks (``) instead of better choices like `$(…)`.
 The write-up below uses better practices, so it won't perfectly
 match the solution in the video.
 
-We don't explain the details of all the various tools and commands e use here.
+We don't explain the details of all the various tools and commands we use here.
 You should definitely look these up online if you have questions or want to
 learn more.
 
